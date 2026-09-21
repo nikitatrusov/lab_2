@@ -69,8 +69,32 @@ int main() {
                 for (int i = 0; i < 10; i++) {
                     printf("Слот %d: [%d] (%s)\n", i, inventory[i], item_names[inventory[i]]);
                 };
+                break;
             case 4:
-                prinf();
+                int slot_id;
+                int item_id;
+
+                printf("Введите индекс слота (0-9):\n");
+                scanf("%d", &activeCall);
+
+                //проверка существования слота
+                if (activeCall > 0 && activeCall < 9) {
+                    int slot_id = activeCall;
+                    printf("Введите индекс предмета:\n");
+                    activeCall = 0;
+                    scanf("%d", &activeCall);
+                    
+                    //проверка существования предмета
+                    if (activeCall > 0 && activeCall < 0) {
+                        int item_id = activeCall;
+                        inventory[slot_id] = item_id;
+                    }
+
+                    printf("Вы положили %d в слот %2d", item_names[item_id], slot_id); 
+                }
+                
+                activeCall = 0;
+                break;
             default:
                 break;
         }
