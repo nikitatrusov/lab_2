@@ -4,18 +4,11 @@ int current_day = 1;
 int current_hour = 8;
 int activeCall;
 int gameState = 0;
-int MAX_SLOTS = 10;
+int inventory[10] = {0};
 
-//Инвентарь и его размер
-Item inventory[MAX_SLOTS] = {0};
-
-
-//Создаем составной тип данных под предметы
-typedef struct {
-    char name[30];
-    int quantity;
-    char description;
-} Item;
+const char* item_names[] = {
+    "Пусто" //индекс 0
+} ;
 
 int main() {
 
@@ -72,7 +65,12 @@ int main() {
                 activeCall = 0;
                 break;
             case 3:
-                
+                printf("--- Инвентарь ---\n");
+                for (int i = 0; i < 10; i++) {
+                    printf("Слот %d: [%d] (%s)\n", i, inventory[i], item_names[inventory[i]]);
+                };
+            case 4:
+                prinf();
             default:
                 break;
         }
