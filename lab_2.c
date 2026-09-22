@@ -35,7 +35,7 @@ int main() {
                "[3] Посмотреть инвентарь\n"
                "[4] Положить предмет в слот\n"
                "[5] Выбросить предмет\n"
-               "[6] 6e6e6e6e\n"
+               "[6] Показать любимый ресурс\n"
                "[7] лабуба\n"
                "\n \n"
         );
@@ -107,6 +107,26 @@ int main() {
                 if (slot_id > -1 && slot_id < 10) {
                     inventory[clear_slot_id] = 0;
                 }
+
+                break;
+            case 6:
+                int count[10] = {0};
+                
+                for (int i = 0; i < 10; i++) { //Не забыть на уровне компилятора написать size!!!
+                    if (inventory[i] != 0) {
+                        count[inventory[i]]++;
+                    }
+                }
+
+                int max_count = 0;
+                int fav_item = 0;
+                for (int i = 0; i < 10; i++) { //Не забыть на уровне компилятора написать size!!!
+                    if (count[i] > max_count) {
+                        max_count = count[i];
+                        fav_item = i;
+                    }
+                }
+                printf("Любимый предмет: %s, он встречается %d раз\n", item_names[fav_item], max_count);
 
                 break;
             default:
