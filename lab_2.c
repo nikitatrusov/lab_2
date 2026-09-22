@@ -7,7 +7,16 @@ int gameState = 0;
 int inventory[10] = {0};
 
 const char* item_names[] = {
-    "Пусто" //индекс 0
+    "Пусто", //индекс 0
+    "Дерево", //индекс 1
+    "Камень", //индекс 2
+    "Семена", //индекс 3
+    "Мотыга", //индекс 4
+    "Лопата", //индекс 5
+    "Лейка", //индекс 6
+    "Зелье роста", //индекс 7
+    "Зелье анти-сорняк", //индекс 8
+    "Зелье водника", //индекс 9
 } ;
 
 int main() {
@@ -75,25 +84,21 @@ int main() {
                 int item_id;
 
                 printf("Введите индекс слота (0-9):\n");
-                scanf("%d", &activeCall);
+                scanf("%d", &slot_id);
 
                 //проверка существования слота
-                if (activeCall > 0 && activeCall < 9) {
-                    int slot_id = activeCall;
+                if (slot_id > -1 && slot_id < 10) {
                     printf("Введите индекс предмета:\n");
-                    activeCall = 0;
-                    scanf("%d", &activeCall);
+                    scanf("%d", &item_id);
                     
                     //проверка существования предмета
-                    if (activeCall > 0 && activeCall < 0) {
-                        int item_id = activeCall;
+                    if (item_id > -1 && item_id < 10) {
                         inventory[slot_id] = item_id;
                     }
 
-                    printf("Вы положили %d в слот %2d", item_names[item_id], slot_id); 
+                    printf("Вы положили %s в слот %2d", item_names[item_id], slot_id); 
                 }
                 
-                activeCall = 0;
                 break;
             default:
                 break;
