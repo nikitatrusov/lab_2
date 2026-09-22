@@ -94,11 +94,20 @@ int main() {
                     //проверка существования предмета
                     if (item_id > -1 && item_id < 10) {
                         inventory[slot_id] = item_id;
+                        printf("Вы положили %s в слот %2d", item_names[item_id], slot_id); 
                     }
-
-                    printf("Вы положили %s в слот %2d", item_names[item_id], slot_id); 
                 }
-                
+
+                break;
+            case 5:
+                int clear_slot_id;
+                printf("Введите индекс слота, который хотите очистить:\n");
+                scanf("%d", &item_id);
+
+                if (slot_id > -1 && slot_id < 10) {
+                    inventory[clear_slot_id] = 0;
+                }
+
                 break;
             default:
                 break;
