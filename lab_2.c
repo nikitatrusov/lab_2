@@ -5,6 +5,7 @@ int current_hour = 8;
 int activeCall;
 int gameState = 0;
 int inventory[10] = {0};
+int enter_data;
 
 const char* item_names[] = {
     "Пусто", //индекс 0
@@ -18,6 +19,30 @@ const char* item_names[] = {
     "Зелье анти-сорняк", //индекс 8
     "Зелье водника", //индекс 9
 } ;
+
+int failsafe_sys() {
+
+        //Захардкоженный failstate
+        int enter_data;
+        int result;
+
+        while (1) {
+            printf("Введите число: ");
+
+            // scanf дате 1, если число успешно считано
+            result = scanf("%d", &enter_data);
+
+            if (result == 1) {
+                //Пользователь НЕ дурак, возвращаем число
+                while (getchar() != '\n');
+                return enter_data;
+            } else {
+                // Ошибка: введены не цифры (буквы, символы и т.д.)
+                printf("Зачем буквы ввел Ара, не делай так дорогой, введи число\n");
+                while (getchar() != '\n');
+            }
+        }
+}
 
 int main() {
 
@@ -40,19 +65,8 @@ int main() {
                "\n \n"
         );
 
-        //Контр-дурак, первый этап
-        if (scanf("%d", &activeCall) != 1) {
-            while(getchar() != '\n');
-            printf("Придурок, введи один из вариантов действия\n");
-            continue;
- 
-        }
-        
-        //Зачистка буфера если гений ввел 1abc
-        while  (getchar() != '\n');       
-
-        // printf("%d\n", activeCall); //затычка для проверки и дебага
-
+        printf("Ваш выбор: ");
+        activeCall = failsafe_sys();
         
         switch(activeCall) {
             case 0:
@@ -156,3 +170,5 @@ int main() {
     //После присвоения нового Call'a пробуем чистить буфер чтобы мусор не копился в буфере
     while  (getchar() != '\n');
 */
+
+
