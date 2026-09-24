@@ -1,10 +1,11 @@
 #include <stdio.h>
 #include <windows.h>
+#define inv_size 10 //в дальнейшем коде используется как верхняя граница 
 int current_day = 1;
 int current_hour = 8;
 int activeCall;
 int gameState = 0;
-int inventory[10] = {0};
+int inventory[inv_size] = {0};
 int enter_data;
 
 const char* item_names[] = {
@@ -89,7 +90,7 @@ int main() {
                 break;
             case 3:
                 printf("--- Инвентарь ---\n");
-                for (int i = 0; i < 10; i++) {
+                for (int i = 0; i < inv_size; i++) {
                     printf("Слот %d: [%d] (%s)\n", i, inventory[i], item_names[inventory[i]]);
                 };
                 break;
@@ -102,11 +103,24 @@ int main() {
 
                 //проверка существования слота
                 if (slot_id > -1 && slot_id < 10) {
-                    printf("Введите индекс предмета:\n");
+                    
+                    printf("\nСписок предметов: \n" 
+                        "Пусто - 0\n" //индекс 0
+                        "Дерево - 1\n" //индекс 1
+                        "Камень - 2\n" //индекс 2
+                        "Семена - 3\n" //индекс 3
+                        "Мотыга - 4\n" //индекс 4
+                        "Лопата - 5\n" //индекс 5
+                        "Лейка - 6\n" //индекс 6
+                        "Зелье роста - 7\n" //индекс 7
+                        "Зелье анти-сорняк - 8\n" //индекс 8
+                        "Зелье водника - 9\n");
+
+                    printf("\nВведите индекс предмета:\n");
                     scanf("%d", &item_id);
                     
                     //проверка существования предмета
-                    if (item_id > -1 && item_id < 10) {
+                    if (item_id > -1 && item_id < inv_size) {
                         inventory[slot_id] = item_id;
                         printf("Вы положили %s в слот %2d", item_names[item_id], slot_id); 
                     }
@@ -118,7 +132,7 @@ int main() {
                 printf("Введите индекс слота, который хотите очистить:\n");
                 scanf("%d", &item_id);
 
-                if (slot_id > -1 && slot_id < 10) {
+                if (slot_id > -1 && slot_id < inv_size) {
                     inventory[clear_slot_id] = 0;
                 }
 
@@ -139,8 +153,10 @@ int main() {
                         max_count = count[i];
                         fav_item = i;
                     }
+
+                    printf("Любимый предмет: %s, он встречается %d раз\n", item_names[fav_item], max_count);
+
                 }
-                printf("Любимый предмет: %s, он встречается %d раз\n", item_names[fav_item], max_count);
 
                 break;
             default:
