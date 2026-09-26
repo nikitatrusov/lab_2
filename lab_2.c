@@ -62,11 +62,9 @@ int main() {
                "[4] Положить предмет в слот\n"
                "[5] Выбросить предмет\n"
                "[6] Показать любимый ресурс\n"
-               "[7] лабуба\n"
                "\n \n"
         );
 
-        printf("Ваш выбор: ");
         activeCall = failsafe_sys();
         
         switch(activeCall) {
@@ -130,7 +128,7 @@ int main() {
             case 5:
                 int clear_slot_id;
                 printf("Введите индекс слота, который хотите очистить:\n");
-                scanf("%d", &item_id);
+                scanf("%d", &clear_slot_id);
 
                 if (slot_id > -1 && slot_id < inv_size) {
                     inventory[clear_slot_id] = 0;
@@ -153,38 +151,12 @@ int main() {
                         max_count = count[i];
                         fav_item = i;
                     }
-
-                    printf("Любимый предмет: %s, он встречается %d раз\n", item_names[fav_item], max_count);
-
                 }
-
+                printf("Любимый предмет: %s, он встречается %d раз\n", item_names[fav_item], max_count);
                 break;
             default:
                 break;
         }
     }
-
     return 0;
 }
-
-
-
-
-/*
-    if (scanf("%d", &activeCall) != 1) {
-        while(getchar() != '\n');
-            printf("Придурок, введи один из вариантов действия")
-         continue;
-    }
-
-    Защита от дурака, идея: 
-    сканим ввод сканф'ом, если пользователь ввел не число, то идет дальше в цикл getchar, который по одному символу его чистит
-    пока не дойдет до некст строки
-
-
-
-    //После присвоения нового Call'a пробуем чистить буфер чтобы мусор не копился в буфере
-    while  (getchar() != '\n');
-*/
-
-
