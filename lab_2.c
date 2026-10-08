@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <windows.h>
 #define inv_size 10 //в дальнейшем коде используется как верхняя граница 
+#define items_index_size 10 //количество предметов в проекте
 int current_day = 1;
 int current_hour = 8;
 int activeCall;
@@ -61,10 +62,53 @@ void time_advance(int hours) {
 
 //Вывод инвентаря на экран
 void inventory_showcase(void) {
-                printf("--- Инвентарь ---\n");
-                for (int i = 0; i < inv_size; i++) {
-                    printf("Слот %d: [%d] (%s)\n", i, inventory[i], item_names[inventory[i]]);
-                };
+    printf("--- Инвентарь ---\n");
+    for (int i = 0; i < inv_size; i++) {
+        printf("Слот %d: [%d] (%s)\n", i, inventory[i], item_names[inventory[i]]);
+    };
+}
+
+    //Вывод списка индексов предметов на экран
+void items_showcase(void) {
+    printf("\nСписок предметов: \n" 
+    "Пусто - 0\n" //индекс 0
+    "Дерево - 1\n" //индекс 1
+    "Камень - 2\n" //индекс 2
+    "Семена - 3\n" //индекс 3
+    "Мотыга - 4\n" //индекс 4
+    "Лопата - 5\n" //индекс 5
+    "Лейка - 6\n" //индекс 6
+    "Зелье роста - 7\n" //индекс 7
+    "Зелье анти-сорняк - 8\n" //индекс 8
+    "Зелье водника - 9\n");
+}
+
+//Положить предмет в инвентарь
+void item_to_inventory(void) {
+    int slot_id;
+    int item_id;
+    printf("Введите индекс слота (0-9):\n");
+    slot_id=failsafe_sys();
+
+    //проверка существования слота
+    if (slot_id > -1 && slot_id < items_index_size) {
+        items_showcase();
+        printf("\nВведите индекс предмета:\n");
+        item_id=failsafe_sys();
+        
+        //проверка существования предмета
+        if (item_id > -1 && item_id < inv_size) {
+            inventory[slot_id] = item_id;
+            printf("Вы положили %s в слот %2d", item_names[item_id], slot_id); 
+            } 
+        else {
+            printf("Такого предмета не существует");
+        }
+        
+    }
+    else {
+        printf("Такого слота не существует");
+    }
 }
 
 int main() {
@@ -97,8 +141,7 @@ int main() {
                 time_showcase();
                 break;
             case 2:
-                printf("Было %d:00 %2d-го дня, сколько часов ты проведешь за работой: "
-                        ,current_hour, current_day);
+                printf("Было %d:00 %2d-го дня, сколько часов ты проведешь за работой: ",current_hour, current_day);
                 activeCall = failsafe_sys();
                 time_advance(activeCall);
                 break;
@@ -106,40 +149,11 @@ int main() {
                 inventory_showcase();
                 break;
             case 4:
-                int slot_id;
-                int item_id;
-
-                printf("Введите индекс слота (0-9):\n");
-                scanf("%d", &slot_id);
-
-                //проверка существования слота
-                if (slot_id > -1 && slot_id < 10) {
-                    
-                    printf("\nСписок предметов: \n" 
-                        "Пусто - 0\n" //индекс 0
-                        "Дерево - 1\n" //индекс 1
-                        "Камень - 2\n" //индекс 2
-                        "Семена - 3\n" //индекс 3
-                        "Мотыга - 4\n" //индекс 4
-                        "Лопата - 5\n" //индекс 5
-                        "Лейка - 6\n" //индекс 6
-                        "Зелье роста - 7\n" //индекс 7
-                        "Зелье анти-сорняк - 8\n" //индекс 8
-                        "Зелье водника - 9\n");
-
-                    printf("\nВведите индекс предмета:\n");
-                    scanf("%d", &item_id);
-                    
-                    //проверка существования предмета
-                    if (item_id > -1 && item_id < inv_size) {
-                        inventory[slot_id] = item_id;
-                        printf("Вы положили %s в слот %2d", item_names[item_id], slot_id); 
-                    }
-                }
-
+                item_to_inventory();
                 break;
             case 5:
                 int clear_slot_id;
+                int slot_id;
                 printf("Введите индекс слота, который хотите очистить:\n");
                 scanf("%d", &clear_slot_id);
 
