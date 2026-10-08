@@ -8,6 +8,7 @@ int gameState = 0;
 int inventory[inv_size] = {0};
 int enter_data;
 
+//Индексы предметов
 const char* item_names[] = {
     "Пусто", //индекс 0
     "Дерево", //индекс 1
@@ -21,9 +22,9 @@ const char* item_names[] = {
     "Зелье водника", //индекс 9
 } ;
 
+//Функция проверки ввода
 int failsafe_sys() {
 
-        //Захардкоженный failstate
         int enter_data;
         int result;
 
@@ -43,6 +44,27 @@ int failsafe_sys() {
                 while (getchar() != '\n');
             }
         }
+}
+
+void time_showcase(void) {
+    printf("Текущее время: День %d, %02d:00\n", current_day, current_hour);   
+}
+
+//Функция изменения времени
+void time_advance(int hours) {
+    if (hours < 0) return;
+    current_hour += hours;
+    current_day += current_hour / 24;
+    current_hour = current_hour % 24;
+    activeCall = 0;
+}
+
+//Вывод инвентаря на экран
+void inventory_showcase(void) {
+                printf("--- Инвентарь ---\n");
+                for (int i = 0; i < inv_size; i++) {
+                    printf("Слот %d: [%d] (%s)\n", i, inventory[i], item_names[inventory[i]]);
+                };
 }
 
 int main() {
@@ -72,25 +94,16 @@ int main() {
                 gameState = 1;
                 break;
             case 1:
-                printf("Текущее время: День %d, %02d:00\n", current_day, current_hour);   
+                time_showcase();
                 break;
             case 2:
-                //Важно! Использую activeCall（и буду использовать) так как это централизованная переменнаяя ввода данных
-                //в которой есть защита от дурня
-                printf("Было %d:00 %2d-го дня, сколько часов ты проведешь за работой: ", current_hour, current_day);
-                scanf("%d", &activeCall);
-                current_hour += activeCall;
-                if (current_hour >= 24) {
-                    current_day += current_hour / 24;
-                    current_hour = current_hour % 24;
-                }
-                activeCall = 0;
+                printf("Было %d:00 %2d-го дня, сколько часов ты проведешь за работой: "
+                        ,current_hour, current_day);
+                activeCall = failsafe_sys();
+                time_advance(activeCall);
                 break;
             case 3:
-                printf("--- Инвентарь ---\n");
-                for (int i = 0; i < inv_size; i++) {
-                    printf("Слот %d: [%d] (%s)\n", i, inventory[i], item_names[inventory[i]]);
-                };
+                inventory_showcase();
                 break;
             case 4:
                 int slot_id;
