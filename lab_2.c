@@ -24,13 +24,13 @@ const char* item_names[] = {
 } ;
 
 //Функция проверки ввода
-int failsafe_sys() {
+int failsafe_sys(const char *message_text) {
 
         int enter_data;
         int result;
 
         while (1) {
-            printf("Введите число: ");
+            printf(message_text);
 
             // scanf дате 1, если число успешно считано
             result = scanf("%d", &enter_data);
@@ -47,12 +47,16 @@ int failsafe_sys() {
         }
 }
 
+//Функция показа времени
 void time_showcase(void) {
     printf("Текущее время: День %d, %02d:00\n", current_day, current_hour);   
 }
 
 //Функция изменения времени
-void time_advance(int hours) {
+void time_advance(void) {
+    int hours;
+    printf("Было %d:00 %2d-го дня, сколько часов ты проведешь за работой:",current_hour, current_day);
+    hours = failsafe_sys(" ");
     if (hours < 0) return;
     current_hour += hours;
     current_day += current_hour / 24;
@@ -68,7 +72,7 @@ void inventory_showcase(void) {
     };
 }
 
-    //Вывод списка индексов предметов на экран
+//Вывод списка индексов предметов на экран
 void items_showcase(void) {
     printf("\nСписок предметов: \n" 
     "Пусто - 0\n" //индекс 0
@@ -87,14 +91,12 @@ void items_showcase(void) {
 void item_to_inventory(void) {
     int slot_id;
     int item_id;
-    printf("Введите индекс слота (0-9):\n");
-    slot_id=failsafe_sys();
+    slot_id=failsafe_sys("Введите индекс слота (0-9): ");
 
     //проверка существования слота
     if (slot_id > -1 && slot_id < items_index_size) {
         items_showcase();
-        printf("\nВведите индекс предмета:\n");
-        item_id=failsafe_sys();
+        item_id=failsafe_sys("\nВведите индекс предмета: ");
         
         //проверка существования предмета
         if (item_id > -1 && item_id < inv_size) {
@@ -109,6 +111,38 @@ void item_to_inventory(void) {
     else {
         printf("Такого слота не существует");
     }
+}
+
+//Любимый предмет в инвентаре
+void clean_inventory_slot(void) {
+    
+    int clear_slot_id;
+    int slot_id;
+    clear_slot_id = failsafe_sys("Введите индекс слота, который хотите очистить: ");
+
+    if (slot_id > -1 && slot_id < inv_size) {
+        inventory[clear_slot_id] = 0;
+    }
+}
+
+void favorite_item_showcase(void) {
+    int count[10] = {0};
+                
+    for (int i = 0; i < 10; i++) { //Не забыть на уровне компилятора написать size!!!
+        if (inventory[i] != 0) {
+            count[inventory[i]]++;
+        }
+    }
+
+    int max_count = 0;
+    int fav_item = 0;
+    for (int i = 0; i < 10; i++) { //Не забыть на уровне компилятора написать size!!!
+        if (count[i] > max_count) {
+            max_count = count[i];
+            fav_item = i;
+        }
+    }
+    printf("Любимый предмет: %s, он встречается %d раз\n", item_names[fav_item], max_count);
 }
 
 int main() {
@@ -131,7 +165,7 @@ int main() {
                "\n \n"
         );
 
-        activeCall = failsafe_sys();
+        activeCall = failsafe_sys("Выбери действие: ");
         
         switch(activeCall) {
             case 0:
@@ -141,9 +175,7 @@ int main() {
                 time_showcase();
                 break;
             case 2:
-                printf("Было %d:00 %2d-го дня, сколько часов ты проведешь за работой: ",current_hour, current_day);
-                activeCall = failsafe_sys();
-                time_advance(activeCall);
+                time_advance();
                 break;
             case 3:
                 inventory_showcase();
@@ -152,34 +184,10 @@ int main() {
                 item_to_inventory();
                 break;
             case 5:
-                int clear_slot_id;
-                int slot_id;
-                printf("Введите индекс слота, который хотите очистить:\n");
-                scanf("%d", &clear_slot_id);
-
-                if (slot_id > -1 && slot_id < inv_size) {
-                    inventory[clear_slot_id] = 0;
-                }
-
+                clean_inventory_slot();
                 break;
             case 6:
-                int count[10] = {0};
-                
-                for (int i = 0; i < 10; i++) { //Не забыть на уровне компилятора написать size!!!
-                    if (inventory[i] != 0) {
-                        count[inventory[i]]++;
-                    }
-                }
-
-                int max_count = 0;
-                int fav_item = 0;
-                for (int i = 0; i < 10; i++) { //Не забыть на уровне компилятора написать size!!!
-                    if (count[i] > max_count) {
-                        max_count = count[i];
-                        fav_item = i;
-                    }
-                }
-                printf("Любимый предмет: %s, он встречается %d раз\n", item_names[fav_item], max_count);
+                favorite_item_showcase();
                 break;
             default:
                 break;
