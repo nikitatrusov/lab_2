@@ -8,6 +8,7 @@ int activeCall;
 int gameState = 0;
 int inventory[inv_size] = {0};
 int enter_data;
+char user_name[33];
 
 //Индексы предметов
 const char* item_names[] = {
@@ -30,8 +31,7 @@ int failsafe_sys(const char *message_text) {
         int result;
 
         while (1) {
-            printf(message_text);
-
+            printf(message_text);   // переделать все через puts(str) !!!!
             // scanf дате 1, если число успешно считано
             result = scanf("%d", &enter_data);
 
@@ -45,6 +45,12 @@ int failsafe_sys(const char *message_text) {
                 while (getchar() != '\n');
             }
         }
+}
+
+void name_asker(void) {
+    printf("Приветствую тебя, фермер. Как тебя зовут?\n");
+    fgets(user_name, sizeof(user_name), stdin);
+    user_name[strcspn(user_name, "\n")] = '\0';
 }
 
 //Функция показа времени
@@ -150,6 +156,9 @@ int main() {
     //Чтобы не съедало кириллицу powershell'ом
     SetConsoleOutputCP(CP_UTF8);
     SetConsoleCP(CP_UTF8);
+
+    name_asker();
+    printf("%s", user_name);
 
     while (gameState == 0) {
 
