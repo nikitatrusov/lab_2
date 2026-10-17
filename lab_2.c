@@ -3,27 +3,13 @@
 #define inv_size 10 //в дальнейшем коде используется как верхняя граница 
 #define MAX_ITEMS 10 //количество предметов в проекте
 #define MAX_NAME_LEN 64 //Длина названия предмета
-Item items_names[MAX_ITEMS];
 
 typedef struct {
     int id;
     char name[MAX_NAME_LEN];
 } Item;
 
-//Индексы предметов
-const char* item_names[] = {
-    "Пусто", //индекс 0
-    "Дерево", //индекс 1
-    "Камень", //индекс 2
-    "Семена", //индекс 3
-    "Мотыга", //индекс 4
-    "Лопата", //индекс 5
-    "Лейка", //индекс 6
-    "Зелье роста", //индекс 7
-    "Зелье анти-сорняк", //индекс 8
-    "Зелье водника", //индекс 9
-} ;
-
+Item item_names[MAX_ITEMS];
 
 void item_catalog_reader(void) {
     FILE *file = fopen("item_catalogue.txt", "r");
@@ -31,18 +17,25 @@ void item_catalog_reader(void) {
         perror("Не удалось найти файл");
     } else {
         printf("Файл прочитан успешно");
-                items_names[MAX_ITEMS] = 0;
+                //item_names[MAX_ITEMS] = 0;
 
         //буферы для считывания данных с item_catalogue.txt
         int temp_id;
         char temp_name[MAX_NAME_LEN];
 
-        while (fscanf(file, "%d\t%63[^\n]\n", &temp_id, temp_name) == 2) {
+        while (fscanf(file, "%d\t%63[^\n]", &temp_id, temp_name) == 2) {
             if (temp_id >= 0 && temp_id < MAX_ITEMS) {
-                items_names[temp_id].id = temp_id;
-                strcpy(items_names[temp_id].name, temp_name);
+                item_names[temp_id].id = temp_id;
+                strcpy(item_names[temp_id].name, temp_name);
             }
         }
+            printf("\n--- СОДЕРЖИМОЕ МАССИВА ПОСЛЕ ЧТЕНИЯ ---\n");
+    for (int i = 0; i < inv_size; i++) {
+        printf("Слот %d: ID = %d | Название: ( %s )\n", 
+               i + 1, 
+               item_names[i].id, 
+               item_names[i].name);
+    }
         fclose(file);
     }
 }
@@ -102,7 +95,7 @@ void time_advance(int *hour, int *day) {
 void inventory_showcase(int *inventory) {
     printf("--- Инвентарь ---\n");
     for (int i = 0; i < inv_size; i++) {
-        printf("Слот %d: [%d] (%s)\n", i, inventory[i], item_names[inventory[i]]);
+        printf("Слот %d: [%d] (%s)\n", i, inventory[i], item_names[inventory[i]].name);
     };
 }
 
@@ -130,14 +123,14 @@ void item_to_inventory(int *inventory) {
     slot_id=failsafe_sys("Введите индекс слота (0-9): ");
 
     //проверка существования слота
-    if (slot_id > -1 && slot_id < MAX_ITEMS) {
+    if (slot_id > -1 && slot_id < inv_size) {
         items_showcase();
         item_id=failsafe_sys("\nВведите индекс предмета: ");
         
         //проверка существования предмета
-        if (item_id > -1 && item_id < inv_size) {
-            inventory[slot_id] = item_id;
-            printf("Вы положили %s в слот %2d", item_names[item_id], slot_id); 
+        if (item_id > -1 && item_id < MAX_ITEMS) {
+            inventory[slot_id] = item_names[item_id].id;
+            printf("Вы положили %s в слот %2d", item_names[item_id].name, slot_id); 
             } 
         else {
             printf("Такого предмета не существует");
