@@ -1,23 +1,30 @@
 #include <stdio.h>
 #include <windows.h>
-#define inv_size 10 //в дальнейшем коде используется как верхняя граница 
+#define INV_SIZE 10 //размер инвентаря
 #define MAX_ITEMS 10 //количество предметов в проекте
 #define MAX_NAME_LEN 64 //Длина названия предмета
 
+int failsafe_sys(const char *message_text);
+
+//Инициализация типа данных Item, в дальнейшем необходимо для хранения списка предметов
 typedef struct {
     int id;
     char name[MAX_NAME_LEN];
 } Item;
 
+//Список предметов
 Item item_names[MAX_ITEMS];
 
+
+//Чтение файла с списком предметов
 void item_catalog_reader(void) {
+
     FILE *file = fopen("item_catalogue.txt", "r");
+
     if (file == NULL) {
         perror("Не удалось найти файл");
     } else {
         printf("Файл прочитан успешно");
-                //item_names[MAX_ITEMS] = 0;
 
         //буферы для считывания данных с item_catalogue.txt
         int temp_id;
@@ -29,15 +36,87 @@ void item_catalog_reader(void) {
                 strcpy(item_names[temp_id].name, temp_name);
             }
         }
-            printf("\n--- СОДЕРЖИМОЕ МАССИВА ПОСЛЕ ЧТЕНИЯ ---\n");
-    for (int i = 0; i < inv_size; i++) {
-        printf("Слот %d: ID = %d | Название: ( %s )\n", 
-               i + 1, 
+        fclose(file);
+    }
+}
+
+//Вывод инвентаря на экран
+void inventory_showcase(int *inventory) {
+    printf("--- Инвентарь ---\n");
+    for (int i = 0; i < INV_SIZE; i++) {
+        printf("Слот %d: [%d] (%s)\n", i, inventory[i], item_names[inventory[i]].name);
+    };
+}
+
+//Вывод индексов предметов на экран
+void items_showcase() {
+    printf("\n--- ПРЕДМЕТЫ ---\n");
+    for (int i = 0; i < MAX_ITEMS; i++) {
+        printf("ID = %d | Название: ( %s )\n",
                item_names[i].id, 
                item_names[i].name);
     }
-        fclose(file);
+}
+
+//Положить предмет в инвентарь
+void item_to_inventory(int *inventory) {
+    int slot_id;
+    int item_id;
+    slot_id=failsafe_sys("Введите индекс слота (0-9): ");
+
+    //проверка существования слота
+    if (slot_id > -1 && slot_id < INV_SIZE) {
+        items_showcase();
+        item_id=failsafe_sys("\nВведите индекс предмета: ");
+        
+        //проверка существования предмета
+        if (item_id > -1 && item_id < MAX_ITEMS) {
+            inventory[slot_id] = item_names[item_id].id;
+            printf("Вы положили %s в слот %2d", item_names[item_id].name, slot_id); 
+            } 
+        else {
+            printf("Такого предмета не существует");
+        }
+        
     }
+    else {
+        printf("Такого слота не существует");
+    }
+}
+
+//Очистка слота инвентаря
+void clean_inventory_slot(int *inventory) {
+    
+    int slot_id;
+    inventory_showcase(inventory);
+    slot_id = failsafe_sys("Введите индекс слота, который хотите очистить: ");
+
+    if (slot_id > -1 && slot_id < INV_SIZE) {
+        inventory[slot_id] = 0;
+    } else {
+        printf("Такого слота не существует");
+    }
+}
+
+//Функция показа любимого предмета
+void favorite_item_showcase(int *inventory) {
+    int count[10] = {0};
+                
+    for (int i = 0; i < INV_SIZE; i++) {
+        if (inventory[i] != 0) {
+            count[inventory[i]]++;
+        }
+    }
+
+    int max_count = 0;
+    int fav_item = 0;
+    for (int i = 0; i < INV_SIZE; i++) {
+        if (count[i] > max_count) {
+            max_count = count[i];
+            fav_item = i;
+        }
+    }
+    printf("Любимый предмет: %s, он встречается %d раз\n", item_names[fav_item].name, max_count);
 }
 
 
@@ -49,7 +128,7 @@ int failsafe_sys(const char *message_text) {
 
         while (1) {
             printf(message_text);   // переделать все через puts(str) !!!!
-            // scanf дате 1, если число успешно считано
+            // scanf дает 1, если число успешно считано
             result = scanf("%d", &enter_data);
 
             if (result == 1) {
@@ -68,8 +147,17 @@ int failsafe_sys(const char *message_text) {
 //Функция запроса имени пользователя
 void name_asker(char *user_name, size_t size) {
     printf("Приветствую тебя, фермер. Как тебя зовут?\n");
-    fgets(user_name, size, stdin);
-    user_name[strcspn(user_name, "\n")] = '\0';
+
+    HANDLE hStdin = GetStdHandle(STD_INPUT_HANDLE); //Дескриптор стандартного ввода(ссылка на консоль), чтобы читать прям оттуда
+    wchar_t wbuf[size];                             //буфер из широких символов, чтобы кириллица не ломалась
+    DWORD charsRead = 0;                            //сколько в итоге символов прочитала функция
+
+    ReadConsoleW(hStdin, wbuf, size - 1, &charsRead, NULL); //Читает строку из консоли. Откуда читать, куда ложить, макс символов
+                                                            //куда записать число прочитанных символов, и NULL
+    wbuf[charsRead] = L'\0';                                //ReadConsoleW не ставит в конце \0, поэтому это делаем мы, чтобы wcscspn остановился
+    wbuf[wcscspn(wbuf, L"\r\n")] = L'\0';                   //Ставим на место конца строки (\r\n) \0
+
+    WideCharToMultiByte(CP_UTF8, 0, wbuf, -1, user_name, (int)size, NULL, NULL); //перевод из unicod'a в UTF-8
 }
 
 
@@ -91,91 +179,6 @@ void time_advance(int *hour, int *day) {
 }
 
 
-//Вывод инвентаря на экран
-void inventory_showcase(int *inventory) {
-    printf("--- Инвентарь ---\n");
-    for (int i = 0; i < inv_size; i++) {
-        printf("Слот %d: [%d] (%s)\n", i, inventory[i], item_names[inventory[i]].name);
-    };
-}
-
-
-//Вывод списка индексов предметов на экран
-void items_showcase(void) {
-    printf("\nСписок предметов: \n" 
-    "Пусто - 0\n" //индекс 0
-    "Дерево - 1\n" //индекс 1
-    "Камень - 2\n" //индекс 2
-    "Семена - 3\n" //индекс 3
-    "Мотыга - 4\n" //индекс 4
-    "Лопата - 5\n" //индекс 5
-    "Лейка - 6\n" //индекс 6
-    "Зелье роста - 7\n" //индекс 7
-    "Зелье анти-сорняк - 8\n" //индекс 8
-    "Зелье водника - 9\n");
-}
-
-
-//Положить предмет в инвентарь
-void item_to_inventory(int *inventory) {
-    int slot_id;
-    int item_id;
-    slot_id=failsafe_sys("Введите индекс слота (0-9): ");
-
-    //проверка существования слота
-    if (slot_id > -1 && slot_id < inv_size) {
-        items_showcase();
-        item_id=failsafe_sys("\nВведите индекс предмета: ");
-        
-        //проверка существования предмета
-        if (item_id > -1 && item_id < MAX_ITEMS) {
-            inventory[slot_id] = item_names[item_id].id;
-            printf("Вы положили %s в слот %2d", item_names[item_id].name, slot_id); 
-            } 
-        else {
-            printf("Такого предмета не существует");
-        }
-        
-    }
-    else {
-        printf("Такого слота не существует");
-    }
-}
-
-
-//Любимый предмет в инвентаре
-void clean_inventory_slot(int *inventory) {
-    
-    int clear_slot_id;
-    int slot_id;
-    clear_slot_id = failsafe_sys("Введите индекс слота, который хотите очистить: ");
-
-    if (slot_id > -1 && slot_id < inv_size) {
-        inventory[clear_slot_id] = 0;
-    }
-}
-
-
-//Функция показа любимого предмета
-void favorite_item_showcase(int *inventory) {
-    int count[10] = {0};
-                
-    for (int i = 0; i < 10; i++) { //Не забыть на уровне компилятора написать size!!!
-        if (inventory[i] != 0) {
-            count[inventory[i]]++;
-        }
-    }
-
-    int max_count = 0;
-    int fav_item = 0;
-    for (int i = 0; i < 10; i++) { //Не забыть на уровне компилятора написать size!!!
-        if (count[i] > max_count) {
-            max_count = count[i];
-            fav_item = i;
-        }
-    }
-    printf("Любимый предмет: %s, он встречается %d раз\n", item_names[fav_item], max_count);
-}
 
 int main() {
 
@@ -184,15 +187,11 @@ int main() {
     int gameState = 0;
     int activeCall;
     char user_name[34];
-    int inventory[inv_size] = {0};
+    int inventory[INV_SIZE] = {0};
 
     //Чтобы не съедало кириллицу powershell'ом
     SetConsoleOutputCP(CP_UTF8);
-    SetConsoleCP(CP_UTF8);
-
-    //Заглушка, убрать
-    name_asker(user_name, sizeof(user_name));
-    printf("%s", user_name);
+    SetConsoleCP(CP_UTF8); 
 
     item_catalog_reader();
 
@@ -207,6 +206,7 @@ int main() {
                "[4] Положить предмет в слот\n"
                "[5] Выбросить предмет\n"
                "[6] Показать любимый ресурс\n"
+               "[7] Ввести имя пользователя\n"
                "\n \n"
         );
 
@@ -233,6 +233,10 @@ int main() {
                 break;
             case 6:
                 favorite_item_showcase(inventory);
+                break;
+            case 7:
+                name_asker(user_name, sizeof(user_name));
+                printf("Привет, %s", user_name);
                 break;
             default:
                 break;
