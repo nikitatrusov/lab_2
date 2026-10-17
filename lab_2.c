@@ -3,7 +3,7 @@
 #define inv_size 10 //в дальнейшем коде используется как верхняя граница 
 #define MAX_ITEMS 10 //количество предметов в проекте
 #define MAX_NAME_LEN 64 //Длина названия предмета
-char items_names[MAX_ITEMS];
+Item items_names[MAX_ITEMS];
 
 typedef struct {
     int id;
@@ -28,10 +28,21 @@ const char* item_names[] = {
 void item_catalog_reader(void) {
     FILE *file = fopen("item_catalogue.txt", "r");
     if (file == NULL) {
-        printf("Не удалось найти файл");
-        items_names[MAX_ITEMS] = 0;
+        perror("Не удалось найти файл");
     } else {
-        printf("Файл создан успешно");
+        printf("Файл прочитан успешно");
+                items_names[MAX_ITEMS] = 0;
+
+        //буферы для считывания данных с item_catalogue.txt
+        int temp_id;
+        char temp_name[MAX_NAME_LEN];
+
+        while (fscanf(file, "%d\t%63[^\n]\n", &temp_id, temp_name) == 2) {
+            if (temp_id >= 0 && temp_id < MAX_ITEMS) {
+                items_names[temp_id].id = temp_id;
+                strcpy(items_names[temp_id].name, temp_name);
+            }
+        }
         fclose(file);
     }
 }
