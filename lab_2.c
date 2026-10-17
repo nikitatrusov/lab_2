@@ -1,8 +1,14 @@
 #include <stdio.h>
 #include <windows.h>
 #define inv_size 10 //в дальнейшем коде используется как верхняя граница 
-#define items_index_size 10 //количество предметов в проекте
+#define MAX_ITEMS 10 //количество предметов в проекте
+#define MAX_NAME_LEN 64 //Длина названия предмета
+char items_names[MAX_ITEMS];
 
+typedef struct {
+    int id;
+    char name[MAX_NAME_LEN];
+} Item;
 
 //Индексы предметов
 const char* item_names[] = {
@@ -17,6 +23,18 @@ const char* item_names[] = {
     "Зелье анти-сорняк", //индекс 8
     "Зелье водника", //индекс 9
 } ;
+
+
+void item_catalog_reader(void) {
+    FILE *file = fopen("item_catalogue.txt", "r");
+    if (file == NULL) {
+        printf("Не удалось найти файл");
+        items_names[MAX_ITEMS] = 0;
+    } else {
+        printf("Файл создан успешно");
+        fclose(file);
+    }
+}
 
 
 //Функция проверки ввода
@@ -101,7 +119,7 @@ void item_to_inventory(int *inventory) {
     slot_id=failsafe_sys("Введите индекс слота (0-9): ");
 
     //проверка существования слота
-    if (slot_id > -1 && slot_id < items_index_size) {
+    if (slot_id > -1 && slot_id < MAX_ITEMS) {
         items_showcase();
         item_id=failsafe_sys("\nВведите индекс предмета: ");
         
@@ -171,6 +189,8 @@ int main() {
     //Заглушка, убрать
     name_asker(user_name, sizeof(user_name));
     printf("%s", user_name);
+
+    item_catalog_reader();
 
     while (gameState == 0) {
 
