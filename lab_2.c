@@ -6,6 +6,7 @@
 #define MAX_USER_NAME_LEN 64    //Длина имени пользователя
 
 int failsafe_sys_numbers(const char *message_text);
+void failsafe_sys_russian(const char *message_text, char *out_message, size_t max_bytes);
 
 //Инициализация типа данных Item, в дальнейшем необходимо для хранения списка предметов
 typedef struct {
@@ -100,34 +101,32 @@ void clean_inventory_slot(int *inventory) {
 }
 
 void inventory_item_search_via_name(int *inventory) {
-    wchar_t wbuf[MAX_ITEM_NAME_LEN];
-    DWORD charsRead = 0;
-    HANDLE hStdin = GetStdHandle(STD_INPUT_HANDLE);
-
-    printf("Введи название предмета, который хочешь найти: ");
-
-    ReadConsoleW(hStdin, wbuf, MAX_ITEM_NAME_LEN - 1, &charsRead, NULL);
-    wbuf[charsRead] = L'\0';
-    wbuf[wcscspn(wbuf, L"\r\n")] = L'\0';
-
+    int search_status = 0;
+    int amount_of_items = 0;
+    char found_item_slots[MAX_INV_SIZE] = {0};
     char searched_item[MAX_ITEM_NAME_LEN * 2];
-    WideCharToMultiByte(CP_UTF8, 0, wbuf, -1, searched_item, sizeof(searched_item), NULL, NULL);
-    int found = 0;
-    printf("Введи название предмета, который хочешь найти: ");
+    failsafe_sys_russian("Введите название предмета, который хочешь найти: ", searched_item, MAX_ITEM_NAME_LEN * 2);
 
     for (int i = 0; i < MAX_INV_SIZE; i++) {
         if (strcmp(searched_item, item_names[inventory[i]].name) == 0) {
-            found = 1;
-            break;
+            amount_of_items ++;
+            found_item_slots[amount_of_items] = i;
+            search_status ++;
         }
     }
         
-    if (found == 1) {
-        printf("Да, объект %s найден\n", searched_item);
+    if (search_status != 1) {
+        printf("Да, объект %s найден, он находится в слоте/ах: ", searched_item);
+        for (int i = 0; i < amount_of_items; i++) {
+            printf("%d", found_item_slots[i]);
+                if (i < amount_of_items - 1) {
+                    printf(", "); 
+                } 
+        }
+                
     } else {
         printf("Нет, предмета %s, у тебя нет\n", searched_item);
     }
-        
 }
 
 //Функция показа любимого предмета
