@@ -98,6 +98,37 @@ void clean_inventory_slot(int *inventory) {
     }
 }
 
+void inventory_item_search_via_name(int *inventory) {
+    wchar_t wbuf[MAX_NAME_LEN];
+    DWORD charsRead = 0;
+    HANDLE hStdin = GetStdHandle(STD_INPUT_HANDLE);
+
+    printf("Введи название предмета, который хочешь найти: ");
+
+    ReadConsoleW(hStdin, wbuf, MAX_NAME_LEN - 1, &charsRead, NULL);
+    wbuf[charsRead] = L'\0';
+    wbuf[wcscspn(wbuf, L"\r\n")] = L'\0';
+
+    char searched_item[MAX_NAME_LEN * 2];
+    WideCharToMultiByte(CP_UTF8, 0, wbuf, -1, searched_item, sizeof(searched_item), NULL, NULL);
+    int found = 0;
+    printf("Введи название предмета, который хочешь найти: ");
+
+    for (int i = 0; i < MAX_ITEMS; i++) {
+        if (strcmp(searched_item, item_names[inventory[i]].name) == 0) {
+            found = 1;
+            break;
+        }
+    }
+        
+    if (found == 1) {
+        printf("Да, объект %s найден\n", searched_item);
+    } else {
+        printf("Нет, предмета %s, у тебя нет\n", searched_item);
+    }
+        
+}
+
 //Функция показа любимого предмета
 void favorite_item_showcase(int *inventory) {
     int count[10] = {0};
@@ -206,7 +237,8 @@ int main() {
                "[4] Положить предмет в слот\n"
                "[5] Выбросить предмет\n"
                "[6] Показать любимый ресурс\n"
-               "[7] Ввести имя пользователя\n"
+               "[7] Найти предмет в инвентаре\n"
+               "[8] Ввести имя пользователя\n"
                "\n \n"
         );
 
@@ -235,6 +267,9 @@ int main() {
                 favorite_item_showcase(inventory);
                 break;
             case 7:
+                inventory_item_search_via_name(inventory);
+                break;
+            case 8:
                 name_asker(user_name, sizeof(user_name));
                 printf("Привет, %s", user_name);
                 break;
