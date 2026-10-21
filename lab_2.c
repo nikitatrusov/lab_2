@@ -1,3 +1,11 @@
+/*
+ToDo 1)провести инициализацию всех переменных в топе файла, перепроверить вопрос безопасности ввода, особенно в failsafe_sys_russian
+     2)устранить старый техдолг
+
+
+*/
+
+
 #include <stdio.h>
 #include <windows.h>
 #define MAX_INV_SIZE 10         //размер инвентаря
@@ -13,6 +21,17 @@ typedef struct {
     int id;
     char name[MAX_ITEM_NAME_LEN];
 } Item;
+
+//Основная структура данных игры
+typedef struct {
+    int current_hour;
+    int current_day;
+    int gamestate;
+    int activeCall;
+    char user_name[MAX_USER_NAME_LEN];
+    int inventory[MAX_INV_SIZE];
+} Gamestate;
+
 
 //Список предметов
 Item item_names[MAX_ITEMS_INGAME];
@@ -40,6 +59,19 @@ void item_catalog_reader(void) {
         }
         fclose(file);
     }
+}
+
+void diary_write(void) {
+
+    FILE *file = fopen("diary.txt", "a");
+
+    if (file == NULL) {
+        perror("Не удалось найти файл");
+    } else {
+        printf("Файл прочитан успешно");
+        fputs("Приветики балабол", file);
+    }
+    fclose(file);
 }
 
 //Вывод инвентаря на экран
@@ -194,20 +226,20 @@ void failsafe_sys_russian(const char *message_text, char *out_message, size_t ma
 
 
 //Функция показа времени
-void time_showcase(int day, int hour) {
-    printf("Текущее время: День %d, %02d:00\n", day, hour);   
+void time_showcase(Gamestate game) {
+    printf("Текущее время: День %d, %02d:00\n", game.current_day, game.current_hour);   
 }
 
 
 //Функция изменения времени
-void time_advance(int *hour, int *day) {
+void time_advance(Gamestate *game) {
     int hours;
-    printf("Было %d:00 %2d-го дня, сколько часов ты проведешь за работой:",*hour, *day); //Подстава. так как мне впадлу переписать fail_sys
+    printf("Было %d:00 %2d-го дня, сколько часов ты проведешь за работой:", game->current_hour, game->current_day); //Подстава. так как мне впадлу переписать fail_sys
     hours = failsafe_sys_numbers("");                                                            //еще раз, есть этот принтф, который в свою очередь
     if (hours < 0) return;                                                               //сдвигает в случае неправильного ввода на след строку
-    *hour += hours;                                                                      //когда нибудь я этим займусь, честно честно
-    *day += *hour / 24;
-    *hour = *hour % 24;
+    game->current_hour += hours;                                                                      //когда нибудь я этим займусь, честно честно
+    game->current_day += game->current_hour / 24;
+    game->current_hour = game->current_hour % 24;
 }
 
 
@@ -220,6 +252,14 @@ int main() {
     int activeCall;
     char user_name[MAX_USER_NAME_LEN];
     int inventory[MAX_INV_SIZE] = {0};
+    
+    Gamestate game = {
+        .current_hour = 8,
+        .current_day = 1,
+        .gamestate = 0,
+        .user_name = "Незнакомец",
+        .inventory = {0}
+    };
 
     //Чтобы не съедало кириллицу powershell'ом
     SetConsoleCP(65001);      // Ввод в UTF-8
@@ -250,10 +290,10 @@ int main() {
                 gameState = 1;
                 break;
             case 1:
-                time_showcase(current_day, current_hour);
+                time_showcase(game);
                 break;
             case 2:
-                time_advance(&current_hour, &current_day);
+                time_advance(&game);
                 break;
             case 3:
                 inventory_showcase(inventory);
@@ -273,6 +313,9 @@ int main() {
             case 8:
                 failsafe_sys_russian("Приветствую тебя, фермер. Как тебя зовут?\n", user_name, sizeof(user_name));
                 printf("Привет, %s", user_name);
+                break;
+            case 9:
+                diary_write();
                 break;
             default:
                 break;
