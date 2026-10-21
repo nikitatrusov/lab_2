@@ -61,39 +61,40 @@ void item_catalog_reader(void) {
     }
 }
 
-void diary_write(void) {
+void diary_write(Gamestate *game) {
 
     FILE *file = fopen("diary.txt", "a");
 
     if (file == NULL) {
-        perror("Не удалось найти файл");
+        perror("Не создать найти файл");
     } else {
-        printf("Файл прочитан успешно");
-        fputs("Приветики балабол", file);
+        printf("Файл найден");
+        fprintf(file, "Имя: %s, Сейчас %d часов %2d-го дня\n", game->user_name, game->current_hour, game->current_day);
+        for (int i = 0; i < MAX_INV_SIZE; i++) {
+            fprintf(file, "Слот %d: [%d] (%s)\n", i, game->inventory[i], item_names[game->inventory[i]].name);
+        }
     }
     fclose(file);
 }
 
 //Вывод инвентаря на экран
-void inventory_showcase(int *inventory) {
+void inventory_showcase(Gamestate game) {
     printf("--- Инвентарь ---\n");
     for (int i = 0; i < MAX_INV_SIZE; i++) {
-        printf("Слот %d: [%d] (%s)\n", i, inventory[i], item_names[inventory[i]].name);
-    };
+        printf("Слот %d: [%d] (%s)\n", i, game.inventory[i], item_names[game.inventory[i]].name);
+    }
 }
 
 //Вывод индексов предметов на экран
 void items_showcase() {
     printf("\n--- ПРЕДМЕТЫ ---\n");
     for (int i = 0; i < MAX_ITEMS_INGAME; i++) {
-        printf("ID = %d | Название: ( %s )\n",
-               item_names[i].id, 
-               item_names[i].name);
+        printf("ID = %d | Название: ( %s )\n", item_names[i].id, item_names[i].name);
     }
 }
 
 //Положить предмет в инвентарь
-void item_to_inventory(int *inventory) {
+void item_to_inventory(Gamestate *game) {
     int slot_id;
     int item_id;
     slot_id=failsafe_sys_numbers("Введите индекс слота (0-9): ");
@@ -105,7 +106,7 @@ void item_to_inventory(int *inventory) {
         
         //проверка существования предмета
         if (item_id > -1 && item_id < MAX_ITEMS_INGAME) {
-            inventory[slot_id] = item_names[item_id].id;
+            game->inventory[slot_id] = item_names[item_id].id;
             printf("Вы положили %s в слот %2d", item_names[item_id].name, slot_id); 
             } 
         else {
@@ -119,20 +120,20 @@ void item_to_inventory(int *inventory) {
 }
 
 //Очистка слота инвентаря
-void clean_inventory_slot(int *inventory) {
+void clean_inventory_slot(Gamestate *game) {
     
     int slot_id;
-    inventory_showcase(inventory);
+    inventory_showcase(*game);
     slot_id = failsafe_sys_numbers("Введите индекс слота, который хотите очистить: ");
 
     if (slot_id > -1 && slot_id < MAX_INV_SIZE) {
-        inventory[slot_id] = 0;
+        game->inventory[slot_id] = 0;
     } else {
         printf("Такого слота не существует");
     }
 }
 
-void inventory_item_search_via_name(int *inventory) {
+void inventory_item_search_via_name(Gamestate game) {
     int search_status = 0;
     int amount_of_items = 0;
     char found_item_slots[MAX_INV_SIZE] = {0};
@@ -140,7 +141,7 @@ void inventory_item_search_via_name(int *inventory) {
     failsafe_sys_russian("Введите название предмета, который хочешь найти: ", searched_item, MAX_ITEM_NAME_LEN * 2);
 
     for (int i = 0; i < MAX_INV_SIZE; i++) {
-        if (strcmp(searched_item, item_names[inventory[i]].name) == 0) {
+        if (strcmp(searched_item, item_names[game.inventory[i]].name) == 0) {
             amount_of_items ++;
             found_item_slots[amount_of_items] = i;
             search_status ++;
@@ -162,12 +163,12 @@ void inventory_item_search_via_name(int *inventory) {
 }
 
 //Функция показа любимого предмета
-void favorite_item_showcase(int *inventory) {
+void favorite_item_showcase(Gamestate game) {
     int count[10] = {0};
                 
     for (int i = 0; i < MAX_INV_SIZE; i++) {
-        if (inventory[i] != 0) {
-            count[inventory[i]]++;
+        if (game.inventory[i] != 0) {
+            count[game.inventory[i]]++;
         }
     }
 
@@ -296,26 +297,26 @@ int main() {
                 time_advance(&game);
                 break;
             case 3:
-                inventory_showcase(inventory);
+                inventory_showcase(game);
                 break;
             case 4:
-                item_to_inventory(inventory);
+                item_to_inventory(&game);
                 break;
             case 5:
-                clean_inventory_slot(inventory);
+                clean_inventory_slot(&game);
                 break;
             case 6:
-                favorite_item_showcase(inventory);
+                favorite_item_showcase(game);
                 break;
             case 7:
-                inventory_item_search_via_name(inventory);
+                inventory_item_search_via_name(game);
                 break;
             case 8:
                 failsafe_sys_russian("Приветствую тебя, фермер. Как тебя зовут?\n", user_name, sizeof(user_name));
                 printf("Привет, %s", user_name);
                 break;
             case 9:
-                diary_write();
+                diary_write(&game);
                 break;
             default:
                 break;
