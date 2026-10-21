@@ -7,6 +7,7 @@ ToDo 1)провести инициализацию всех переменных
 
 
 #include <stdio.h>
+#include <string.h>
 #include <windows.h>
 #define MAX_INV_SIZE 10         //размер инвентаря
 #define MAX_ITEMS_INGAME 10     //количество предметов в проекте
@@ -30,14 +31,26 @@ typedef struct {
     int activeCall;
     char user_name[MAX_USER_NAME_LEN];
     int inventory[MAX_INV_SIZE];
-} Gamestate;
+} GameState;
+
+//Информация о карте
+typedef struct {
+    int size_x;
+    int size_y;
+    int size_z;
+    char map_name[100]; //Временно для тестов!!!!!
+} MapInfo;
 
 
 //Список предметов
 Item item_names[MAX_ITEMS_INGAME];
 
 
-//Чтение файла с списком предметов
+//Времянка
+MapInfo test = {10,5,1,"aboba"};
+
+
+//Чтение файла с списком предметов item_catalogue.txt
 void item_catalog_reader(void) {
 
     FILE *file = fopen("item_catalogue.txt", "r");
@@ -61,7 +74,8 @@ void item_catalog_reader(void) {
     }
 }
 
-void diary_write(Gamestate *game) {
+//Запись состояния игры в файл diary.txt
+void diary_write(GameState *game) {
 
     FILE *file = fopen("diary.txt", "a");
 
@@ -77,8 +91,22 @@ void diary_write(Gamestate *game) {
     fclose(file);
 }
 
+void map_encoding(MapInfo *map, char *source, char *destination) {
+    int x_string_size = strlen(map->size_x);
+    int y_string_size = strlen(map->size_y);
+    int z_levels = strlen(map->size_z);
+    for (int i = 0; i < x_string_size; ) {
+        int symbol_counter = 1;
+        while (i + symbol_counter < x_string_size && source[i + symbol_counter] == source[i])
+            symbol_counter ++;
+        destination += sprintf(destination, "%d%c", symbol_counter, source[i]);
+        i += symbol_counter;
+    }
+    *destination = '\0';
+}
+
 //Вывод инвентаря на экран
-void inventory_showcase(Gamestate game) {
+void inventory_showcase(GameState game) {
     printf("--- Инвентарь ---\n");
     for (int i = 0; i < MAX_INV_SIZE; i++) {
         printf("Слот %d: [%d] (%s)\n", i, game.inventory[i], item_names[game.inventory[i]].name);
@@ -94,7 +122,7 @@ void items_showcase() {
 }
 
 //Положить предмет в инвентарь
-void item_to_inventory(Gamestate *game) {
+void item_to_inventory(GameState *game) {
     int slot_id;
     int item_id;
     slot_id=failsafe_sys_numbers("Введите индекс слота (0-9): ");
@@ -120,7 +148,7 @@ void item_to_inventory(Gamestate *game) {
 }
 
 //Очистка слота инвентаря
-void clean_inventory_slot(Gamestate *game) {
+void clean_inventory_slot(GameState *game) {
     
     int slot_id;
     inventory_showcase(*game);
@@ -133,7 +161,7 @@ void clean_inventory_slot(Gamestate *game) {
     }
 }
 
-void inventory_item_search_via_name(Gamestate game) {
+void inventory_item_search_via_name(GameState game) {
     int search_status = 0;
     int amount_of_items = 0;
     char found_item_slots[MAX_INV_SIZE] = {0};
@@ -163,7 +191,7 @@ void inventory_item_search_via_name(Gamestate game) {
 }
 
 //Функция показа любимого предмета
-void favorite_item_showcase(Gamestate game) {
+void favorite_item_showcase(GameState game) {
     int count[10] = {0};
                 
     for (int i = 0; i < MAX_INV_SIZE; i++) {
@@ -227,13 +255,13 @@ void failsafe_sys_russian(const char *message_text, char *out_message, size_t ma
 
 
 //Функция показа времени
-void time_showcase(Gamestate game) {
+void time_showcase(GameState game) {
     printf("Текущее время: День %d, %02d:00\n", game.current_day, game.current_hour);   
 }
 
 
 //Функция изменения времени
-void time_advance(Gamestate *game) {
+void time_advance(GameState *game) {
     int hours;
     printf("Было %d:00 %2d-го дня, сколько часов ты проведешь за работой:", game->current_hour, game->current_day); //Подстава. так как мне впадлу переписать fail_sys
     hours = failsafe_sys_numbers("");                                                            //еще раз, есть этот принтф, который в свою очередь
@@ -254,7 +282,7 @@ int main() {
     char user_name[MAX_USER_NAME_LEN];
     int inventory[MAX_INV_SIZE] = {0};
     
-    Gamestate game = {
+    GameState game = {
         .current_hour = 8,
         .current_day = 1,
         .gamestate = 0,
@@ -281,6 +309,7 @@ int main() {
                "[6] Показать любимый ресурс\n"
                "[7] Найти предмет в инвентаре\n"
                "[8] Ввести имя пользователя\n"
+               "[9] Записать информацию в дневник\n"
                "\n \n"
         );
 
@@ -317,6 +346,7 @@ int main() {
                 break;
             case 9:
                 diary_write(&game);
+                map_encoding(test, )
                 break;
             default:
                 break;
