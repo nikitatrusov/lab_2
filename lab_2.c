@@ -1,10 +1,9 @@
 /*
-ToDo 1)провести инициализацию всех переменных в топе файла, перепроверить вопрос безопасности ввода, особенно в failsafe_sys_russian
+ToDo 1)Перепроверить вопрос безопасности ввода, особенно в failsafe_sys_russian
      2)устранить старый техдолг
-
+    3)Унифицировать вывод строк на экран через отдельную функцию
 
 */
-
 
 #include <stdio.h>
 #include <string.h>
@@ -13,10 +12,6 @@ ToDo 1)провести инициализацию всех переменных
 #define MAX_ITEMS_INGAME 10     //количество предметов в проекте
 #define MAX_ITEM_NAME_LEN 64    //Длина названия предмета
 #define MAX_USER_NAME_LEN 64    //Длина имени пользователя
-
-int failsafe_sys_numbers(const char *message_text);
-void failsafe_sys_russian(const char *message_text, char *out_message, size_t max_bytes);
-int map_decoder(const char *encoded, char *decoded, int cap);
 
 //Инициализация типа данных Item, в дальнейшем необходимо для хранения списка предметов
 typedef struct {
@@ -28,7 +23,7 @@ typedef struct {
 typedef struct {
     int current_hour;
     int current_day;
-    int gamestate;
+    int gameState;
     int activeCall;
     char user_name[MAX_USER_NAME_LEN];
     int inventory[MAX_INV_SIZE];
@@ -42,13 +37,27 @@ typedef struct {
     char map_name[100]; //Временно для тестов!!!!!
 } MapInfo;
 
-
 //Список предметов
 Item item_names[MAX_ITEMS_INGAME];
 
 
-//Времянка
-MapInfo test = {10,5,1,"aboba"};
+int failsafe_sys_numbers(const char *message_text);
+void failsafe_sys_russian(const char *message_text, char *out_message, size_t max_bytes);
+
+int map_decoder(const char *encoded, char *decoded, int cap);
+void diary_write(GameState *game);
+void item_catalog_reader(void);
+void read_map(void);
+
+void inventory_showcase(GameState game);
+void inventory_item_add(GameState *game);
+void inventory_slot_clean(GameState *game);
+void inventory_item_search_via_name(GameState game);
+void inventory_favorite_item_showcase(GameState game);
+void items_index_showcase();
+
+void time_showcase(GameState game);
+void time_advance(GameState *game);
 
 
 //Чтение файла с списком предметов item_catalogue.txt
@@ -161,7 +170,7 @@ void inventory_showcase(GameState game) {
 }
 
 //Вывод индексов предметов на экран
-void items_showcase() {
+void items_index_showcase() {
     printf("\n--- ПРЕДМЕТЫ ---\n");
     for (int i = 0; i < MAX_ITEMS_INGAME; i++) {
         printf("ID = %d | Название: ( %s )\n", item_names[i].id, item_names[i].name);
@@ -169,14 +178,14 @@ void items_showcase() {
 }
 
 //Положить предмет в инвентарь
-void item_to_inventory(GameState *game) {
+void inventory_item_add(GameState *game) {
     int slot_id;
     int item_id;
     slot_id=failsafe_sys_numbers("Введите индекс слота (0-9): ");
 
     //проверка существования слота
     if (slot_id > -1 && slot_id < MAX_INV_SIZE) {
-        items_showcase();
+        items_index_showcase();
         item_id=failsafe_sys_numbers("\nВведите индекс предмета: ");
         
         //проверка существования предмета
@@ -195,7 +204,7 @@ void item_to_inventory(GameState *game) {
 }
 
 //Очистка слота инвентаря
-void clean_inventory_slot(GameState *game) {
+void inventory_slot_clean(GameState *game) {
     
     int slot_id;
     inventory_showcase(*game);
@@ -238,7 +247,7 @@ void inventory_item_search_via_name(GameState game) {
 }
 
 //Функция показа любимого предмета
-void favorite_item_showcase(GameState game) {
+void inventory_favorite_item_showcase(GameState game) {
     int count[10] = {0};
                 
     for (int i = 0; i < MAX_INV_SIZE; i++) {
@@ -284,13 +293,13 @@ int failsafe_sys_numbers(const char *message_text) {
 
 //Функция проверки ввода для русского языка
 void failsafe_sys_russian(const char *message_text, char *out_message, size_t max_bytes) {
-        HANDLE hStdin = GetStdHandle(STD_INPUT_HANDLE); //Дескриптор стандартного ввода(ссылка на консоль), чтобы читать прям оттуда
+        HANDLE h_stdin = GetStdHandle(STD_INPUT_HANDLE); //Дескриптор стандартного ввода(ссылка на консоль), чтобы читать прям оттуда
         wchar_t wbuf[MAX_ITEM_NAME_LEN];                //буфер из широких символов, чтобы кириллица не ломалась
         DWORD charsRead = 0;                            //сколько в итоге символов прочитала функция
 
         fputs(message_text, stdout);                                    //Безопасно выводим текст
         fflush(stdout);                                                 //Принудительный сброс буфера
-        ReadConsoleW(hStdin, wbuf, max_bytes - 1, &charsRead, NULL);    //Читает строку из консоли. Откуда читать, куда ложить, макс символов
+        ReadConsoleW(h_stdin, wbuf, max_bytes - 1, &charsRead, NULL);    //Читает строку из консоли. Откуда читать, куда ложить, макс символов
                                                                         //куда записать число прочитанных символов, и NULL
                                                                         //ReadConsoleW не ставит в конце \0, поэтому это делаем мы, чтобы wcscspn остановился
                                                                         //Ставим на место конца строки (\r\n) \0
@@ -332,7 +341,7 @@ int main() {
     GameState game = {
         .current_hour = 8,
         .current_day = 1,
-        .gamestate = 0,
+        .gameState = 0,
         .user_name = "Незнакомец",
         .inventory = {0}
     };
@@ -376,13 +385,13 @@ int main() {
                 inventory_showcase(game);
                 break;
             case 4:
-                item_to_inventory(&game);
+                inventory_item_add(&game);
                 break;
             case 5:
-                clean_inventory_slot(&game);
+                inventory_slot_clean(&game);
                 break;
             case 6:
-                favorite_item_showcase(game);
+                inventory_favorite_item_showcase(game);
                 break;
             case 7:
                 inventory_item_search_via_name(game);
