@@ -93,20 +93,34 @@ void diary_write(GameState *game) {
 }
 
 void read_map(void) {
-    FILE *in = fopen("Input.txt", "r");
-    if (in == NULL) {
+    FILE *input = fopen("Input.txt", "r");
+    if (input == NULL) {
         printf("Не удалось открыть файл");
         return;
     }
 
     char line[1000];
     char decoded[1000];
+    int line_number = 0;
+    int first_len = -1;
 
-    while (fgets(line, sizeof line, in) != NULL) {
+    while (fgets(line, sizeof line, input) != NULL) {
+        line_number ++;
         line[strcspn(line, "\r\n")] = '\0';
-        map_decoder(line, decoded, sizeof decoded);
+        int len = map_decoder(line, decoded, sizeof decoded);
+
+        if (first_len == -1) {                 //Сравниваем все строки по длине первой строки. Так что важно в ней не наложать
+            first_len = len;
+        } else if (len != first_len) {
+            printf("Ошибка, строка %d имеет длину %d, согласно первой строке ожидается %d\n", line_number, len, first_len);
+            fclose(input);
+            return;
+        }
+
         printf("%s\n", decoded);
     }
+
+    FCLOSE(input);
 }
 
 int map_decoder(const char *encoded, char *decoded, int cap) {
