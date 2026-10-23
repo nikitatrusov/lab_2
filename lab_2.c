@@ -407,7 +407,7 @@ int main() {
                 break;
             case 8:
                 failsafe_sys_russian("Приветствую тебя, фермер. Как тебя зовут?\n", user_name, sizeof(user_name));
-                printf("Привет, %s", user_name);
+                printf("Привет, %s", game.user_name);
                 break;
             case 9:
                 diary_write(&game);
