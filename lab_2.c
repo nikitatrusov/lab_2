@@ -95,8 +95,14 @@ void diary_write(GameState *game) {
 void read_map(void) {
     FILE *input = fopen("Input.txt", "r");
     if (input == NULL) {
-        printf("Не удалось открыть файл");
+        printf("Не удалось открыть файл для получения кодированной карты");
         return;
+    }
+
+    FILE *output = fopen("output.txt", "w");
+    if (output == NULL) {
+        printf("Не удалось открыть файл для записи декодированной карты");
+        return;       
     }
 
     char line[1000];
@@ -109,18 +115,25 @@ void read_map(void) {
         line[strcspn(line, "\r\n")] = '\0';
         int len = map_decoder(line, decoded, sizeof decoded);
 
-        if (first_len == -1) {                 //Сравниваем все строки по длине первой строки. Так что важно в ней не наложать
+        if (first_len == -1) {                 //Проверка: Сравниваем все строки по длине первой строки. Так что важно в ней не наложать
             first_len = len;
         } else if (len != first_len) {
             printf("Ошибка, строка %d имеет длину %d, согласно первой строке ожидается %d\n", line_number, len, first_len);
             fclose(input);
+            fclose(output);
             return;
         }
 
-        printf("%s\n", decoded);
+        rewind(input);                          //Запись: Возвращаемся к чтению input, только теперь, после проверки записываем все в output
+        while (fgets(line, sizeof line, input) != NULL) {
+            line[strcspn(line, "\r\n")] = '\0';
+            map_decoder(line, decoded, sizeof decoded);
+            fprintf(output, "%s\n", decoded);
+        }
     }
 
-    FCLOSE(input);
+    fclose(input);
+    fclose(output);
 }
 
 int map_decoder(const char *encoded, char *decoded, int cap) {
