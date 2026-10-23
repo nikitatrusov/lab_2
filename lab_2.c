@@ -16,6 +16,7 @@ ToDo 1)провести инициализацию всех переменных
 
 int failsafe_sys_numbers(const char *message_text);
 void failsafe_sys_russian(const char *message_text, char *out_message, size_t max_bytes);
+int map_decoder(const char *encoded, char *decoded, int cap);
 
 //Инициализация типа данных Item, в дальнейшем необходимо для хранения списка предметов
 typedef struct {
@@ -89,6 +90,23 @@ void diary_write(GameState *game) {
         }
     }
     fclose(file);
+}
+
+void read_map(void) {
+    FILE *in = fopen("Input.txt", "r");
+    if (in == NULL) {
+        printf("Не удалось открыть файл");
+        return;
+    }
+
+    char line[1000];
+    char decoded[1000];
+
+    while (fgets(line, sizeof line, in) != NULL) {
+        line[strcspn(line, "\r\n")] = '\0';
+        map_decoder(line, decoded, sizeof decoded);
+        printf("%s\n", decoded);
+    }
 }
 
 int map_decoder(const char *encoded, char *decoded, int cap) {
@@ -348,9 +366,9 @@ int main() {
                 break;
             case 9:
                 diary_write(&game);
-                char decoded[100];
-                map_decoder("5#5%", decoded, sizeof decoded);
-                printf("%s\n", decoded);
+                char decoded[1000];
+                printf("\n");
+                read_map();
                 break;
             default:
                 break;
