@@ -223,24 +223,28 @@ void inventory_slot_clean(GameState *game) {
 }
 
 void inventory_item_search_via_name(GameState game) {
-    int search_status = 0;
     int amount_of_items = 0;
+
     char found_item_slots[MAX_INV_SIZE] = {0};
     char searched_item[MAX_ITEM_NAME_LEN * 2];
+
     failsafe_sys_russian("Введите название предмета, который хочешь найти: ", searched_item, MAX_ITEM_NAME_LEN * 2);
 
     for (int i = 0; i < MAX_INV_SIZE; i++) {
-        if (game.inventory[i] != 0 && strcmp(searched_item, item_names[game.inventory[i]].name) == 0) {
-            amount_of_items ++;
-            found_item_slots[amount_of_items] = i;
-            search_status ++;
+        int item_id = game.inventory[i];
+
+        if (item_id >= 0 && item_id < MAX_ITEMS_INGAME) {
+            if (strcmp(searched_item, item_names[item_id].name) == 0) {
+                found_item_slots[amount_of_items] = i;
+                amount_of_items ++;
+            }
         }
     }
         
-    if (search_status > 0) {
+    if (amount_of_items > 0) {
         printf("Да, объект %s найден, он находится в слоте/ах: ", searched_item);
         for (int i = 0; i < amount_of_items; i++) {
-            printf("%d", found_item_slots[i]);
+                printf("%d", found_item_slots[i]);
                 if (i < amount_of_items - 1) {
                     printf(", "); 
                 } 
