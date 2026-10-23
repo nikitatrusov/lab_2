@@ -91,14 +91,15 @@ void diary_write(GameState *game) {
 
     if (file == NULL) {
         perror("Не создать найти файл");
+        fclose(file);
     } else {
         printf("Файл найден");
         fprintf(file, "Имя: %s, Сейчас %d часов %2d-го дня\n", game->user_name, game->current_hour, game->current_day);
         for (int i = 0; i < MAX_INV_SIZE; i++) {
             fprintf(file, "Слот %d: [%d] (%s)\n", i, game->inventory[i], item_names[game->inventory[i]].name);
+            fclose(file);
         }
     }
-    fclose(file);
 }
 
 void read_map(void) {
@@ -111,6 +112,7 @@ void read_map(void) {
     FILE *output = fopen("output.txt", "w");
     if (output == NULL) {
         printf("Не удалось открыть файл для записи декодированной карты");
+        fclose(input);
         return;       
     }
 
@@ -118,6 +120,7 @@ void read_map(void) {
     char decoded[1000];
     int line_number = 0;
     int first_len = -1;
+    int safety = 1;
 
     while (fgets(line, sizeof line, input) != NULL) {
         line_number ++;
@@ -128,21 +131,23 @@ void read_map(void) {
             first_len = len;
         } else if (len != first_len) {
             printf("Ошибка, строка %d имеет длину %d, согласно первой строке ожидается %d\n", line_number, len, first_len);
-            fclose(input);
-            fclose(output);
+            safety = 0;
             return;
         }
 
-        rewind(input);                          //Запись: Возвращаемся к чтению input, только теперь, после проверки записываем все в output
-        while (fgets(line, sizeof line, input) != NULL) {
-            line[strcspn(line, "\r\n")] = '\0';
-            map_decoder(line, decoded, sizeof decoded);
-            fprintf(output, "%s\n", decoded);
+        if (safety = 1) {
+            rewind(input);                          //Запись: Возвращаемся к чтению input, только теперь, после проверки записываем все в output
+            while (fgets(line, sizeof line, input) != NULL) {
+                line[strcspn(line, "\r\n")] = '\0';
+                map_decoder(line, decoded, sizeof decoded);
+                fprintf(output, "%s\n", decoded);
+            }
         }
     }
 
-    fclose(input);
+
     fclose(output);
+    fclose(input);
 }
 
 int map_decoder(const char *encoded, char *decoded, int cap) {
@@ -225,14 +230,14 @@ void inventory_item_search_via_name(GameState game) {
     failsafe_sys_russian("Введите название предмета, который хочешь найти: ", searched_item, MAX_ITEM_NAME_LEN * 2);
 
     for (int i = 0; i < MAX_INV_SIZE; i++) {
-        if (strcmp(searched_item, item_names[game.inventory[i]].name) == 0) {
+        if (game.inventory[i] != 0 && strcmp(searched_item, item_names[game.inventory[i]].name) == 0) {
             amount_of_items ++;
             found_item_slots[amount_of_items] = i;
             search_status ++;
         }
     }
         
-    if (search_status != 1) {
+    if (search_status > 0) {
         printf("Да, объект %s найден, он находится в слоте/ах: ", searched_item);
         for (int i = 0; i < amount_of_items; i++) {
             printf("%d", found_item_slots[i]);
@@ -240,7 +245,7 @@ void inventory_item_search_via_name(GameState game) {
                     printf(", "); 
                 } 
         }
-                
+        printf("\n");
     } else {
         printf("Нет, предмета %s, у тебя нет\n", searched_item);
     }
