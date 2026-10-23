@@ -91,18 +91,20 @@ void diary_write(GameState *game) {
     fclose(file);
 }
 
-void map_encoding(MapInfo *map, char *source, char *destination) {
-    int x_string_size = strlen(map->size_x);
-    int y_string_size = strlen(map->size_y);
-    int z_levels = strlen(map->size_z);
-    for (int i = 0; i < x_string_size; ) {
-        int symbol_counter = 1;
-        while (i + symbol_counter < x_string_size && source[i + symbol_counter] == source[i])
-            symbol_counter ++;
-        destination += sprintf(destination, "%d%c", symbol_counter, source[i]);
-        i += symbol_counter;
+int map_decoder(const char *encoded, char *decoded, int cap) {
+    int len = 0, counter = 0;
+    for (; *encoded; encoded++) {                                   //Проходимся по каждому символу в оригинальной строке
+        if (*encoded >= '0' && *encoded <= '9') {                   //Говорим, что цифры - коды в диапазоне ежду символами '0' и '9'
+            counter = counter * 10 + (*encoded - '0');              //'7' - '0' = 55-48 = 7. '7' -> 7. Плюс умножение на 10, если элементов больше 9
+        } else {                                                    
+            for (int i = 0; i < counter && len < cap - 1; i++) {    //Защита от переполнения. -1 для того чтобы влез \0
+                decoded[len++] = *encoded;                          //Запихиваем символ в dcd и 
+            }
+            counter = 0;
+        }
     }
-    *destination = '\0';
+    decoded[len] = '\0';
+    return len;
 }
 
 //Вывод инвентаря на экран
@@ -346,7 +348,9 @@ int main() {
                 break;
             case 9:
                 diary_write(&game);
-                map_encoding(test, )
+                char decoded[100];
+                map_decoder("5#5%", decoded, sizeof decoded);
+                printf("%s\n", decoded);
                 break;
             default:
                 break;
