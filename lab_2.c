@@ -97,12 +97,14 @@ void diary_write(GameState *game) {
         fprintf(file, "Имя: %s, Сейчас %d часов %2d-го дня\n", game->user_name, game->current_hour, game->current_day);
         for (int i = 0; i < MAX_INV_SIZE; i++) {
             fprintf(file, "Слот %d: [%d] (%s)\n", i, game->inventory[i], item_names[game->inventory[i]].name);
-            fclose(file);
+            
         }
     }
+    fclose(file);
 }
 
 void read_map(void) {
+    int safety = 1;
     FILE *input = fopen("Input.txt", "r");
     if (input == NULL) {
         printf("Не удалось открыть файл для получения кодированной карты");
@@ -120,7 +122,6 @@ void read_map(void) {
     char decoded[1000];
     int line_number = 0;
     int first_len = -1;
-    int safety = 1;
 
     while (fgets(line, sizeof line, input) != NULL) {
         line_number ++;
@@ -133,18 +134,17 @@ void read_map(void) {
             printf("Ошибка, строка %d имеет длину %d, согласно первой строке ожидается %d\n", line_number, len, first_len);
             safety = 0;
             return;
-        }
+        } }
 
-        if (safety = 1) {
-            rewind(input);                          //Запись: Возвращаемся к чтению input, только теперь, после проверки записываем все в output
-            while (fgets(line, sizeof line, input) != NULL) {
-                line[strcspn(line, "\r\n")] = '\0';
-                map_decoder(line, decoded, sizeof decoded);
-                fprintf(output, "%s\n", decoded);
+    if (safety = 1) {
+        rewind(input);                          //Запись: Возвращаемся к чтению input, только теперь, после проверки записываем все в output
+        while (fgets(line, sizeof line, input) != NULL) {
+            line[strcspn(line, "\r\n")] = '\0';
+            map_decoder(line, decoded, sizeof decoded);
+            fprintf(output, "%s\n", decoded);
             }
-        }
+        
     }
-
 
     fclose(output);
     fclose(input);
