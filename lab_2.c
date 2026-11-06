@@ -37,12 +37,19 @@ typedef struct {
     char map_name[100]; //Временно для тестов!!!!!
 } MapInfo;
 
+typedef struct {
+    char **tiles;
+    int width, height;
+    int playerX, playerY;
+} Level;
+
 //Список предметов
 Item item_names[MAX_ITEMS_INGAME];
 
 
 int failsafe_sys_numbers(const char *message_text);
 void failsafe_sys_russian(const char *message_text, char *out_message, size_t max_bytes);
+int randRange(int min, int max);
 
 int map_decoder(const char *encoded, char *decoded, int cap);
 void diary_write(GameState *game);
@@ -277,6 +284,11 @@ void inventory_favorite_item_showcase(GameState game) {
 }
 
 
+int randRange(int min, int max) {
+    return min + rand() % (max - min +1);
+}
+
+
 //Функция проверки ввода для числовых значений
 int failsafe_sys_numbers(const char *message_text) {
 
@@ -414,6 +426,9 @@ int main() {
                 char decoded[1000];
                 printf("\n");
                 read_map();
+                break;
+            case 10:
+
                 break;
             default:
                 break;
