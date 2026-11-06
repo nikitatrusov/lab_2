@@ -12,6 +12,7 @@ ToDo 1)Перепроверить вопрос безопасности ввод
 #define MAX_ITEMS_INGAME 10     //количество предметов в проекте
 #define MAX_ITEM_NAME_LEN 64    //Длина названия предмета
 #define MAX_USER_NAME_LEN 64    //Длина имени пользователя
+#define MAX_FLOORS 10           //Количество этажей    
 
 //Инициализация типа данных Item, в дальнейшем необходимо для хранения списка предметов
 typedef struct {
@@ -41,13 +42,15 @@ typedef struct {
     char *mapLocation;
     int width, height;
     int playerX, playerY;
+    int floor_number;
 } Level;
 
 Level level_test = {
     .width = 10,
     .height = 10,
     .playerX = 5,
-    .playerY = 5
+    .playerY = 5,
+    .floor_number = 1
 };
 
 //Список предметов
@@ -75,7 +78,6 @@ void time_advance(GameState *game);
 
 
 int generate_map(Level *level_test) {
-    //char *map = calloc(level_test->width * level_test->height, sizeof(*map));
     free(level_test->mapLocation);
     level_test->mapLocation = NULL;
     level_test->mapLocation = calloc(level_test->width * level_test->height, 1);
@@ -94,8 +96,36 @@ int generate_map(Level *level_test) {
                 level_test->mapLocation[tileId] = '.';
         }
     }
+
+    level_test->mapLocation[level_test->playerY * level_test->width + level_test->playerX] = 'D'; //Лестница на выход
+
+    int ux, uy, tries = 0;
+    do {
+        ux = 1 + rand() % (level_test->width - 2);
+        uy = 1 + rand() % (level_test->height - 2);
+        tries++;
+    } while (level_test->mapLocation[uy * level_test->width + ux] != '.' && tries < 100);
+    level_test->mapLocation[uy * level_test->width + ux] = 'U';
+
+
+    int fans = 2 + rand() % 3;   // 2..4
+    for (int i = 0; i < fans; i++) {
+        int fx, fy, tries = 0;
+        do {
+            fx = 1 + rand() % (level_test->width - 2);
+            fy = 1 + rand() % (level_test->height - 2);
+            tries++;
+        } while (level_test->mapLocation[fy * level_test->width + fx] != '.' && tries < 100);
+        if (level_test->mapLocation[fy * level_test->width + fx] != '.') continue;
+
+        const char dirs[] = "><^v";
+        level_test->mapLocation[fy * level_test->width + fx] = dirs[rand() % 4];
+    }
     return 0;
 }
+
+
+
 
 
 void render_map(Level *level_test) {
@@ -124,24 +154,97 @@ int move_check(Level *level_test, int dx, int dy) {
     return 1;
 }
 
+// 0 — ничего, 1 — поднялся, -1 — спустился, 2 — вышел из логова сатаны
+int check_stairs(Level *level) {
+    char here = level->mapLocation[level->playerY * level->width + level->playerX];
+
+    if (here == 'U') {
+        level->playerX = level->width / 2;
+        level->playerY = level->height / 2;
+        if (generate_map(level) != 0) return -1;
+        level->floor_number++;
+        return 1;
+    }
+
+    if (here == 'D') {
+        if (level->floor_number == 1) {
+            return 2;   // вышел из башни
+        }
+        level->floor_number--;
+        if (generate_map(level) != 0) return -1;
+        // игрок начинает на новой U
+        for (int y = 1; y < level->height - 1; y++)
+            for (int x = 1; x < level->width - 1; x++)
+                if (level->mapLocation[y * level->width + x] == 'U') {
+                    level->playerX = x;
+                    level->playerY = y;
+                    return -1;
+                }
+        return -1;
+    }
+
+    return 0;
+}
+
+int apply_fan(Level *level) {
+    char here = level->mapLocation[level->playerY * level->width + level->playerX];
+
+    int dx = 0, dy = 0;
+    switch (here) {
+        case '>': dx = +1; break;
+        case '<': dx = -1; break;
+        case '^': dy = -1; break;
+        case 'v': dy = +1; break;
+        default:  return 0;   // не вентилятор
+    }
+
+
+    for (int step = 0; step < 3; step++) {
+        int nx = level->playerX + dx;
+        int ny = level->playerY + dy;
+
+        if (nx < 0 || nx >= level->width)  break;
+        if (ny < 0 || ny >= level->height) break;
+        if (level->mapLocation[ny * level->width + nx] == '#') break;
+
+        level->playerX = nx;
+        level->playerY = ny;
+    }
+
+    return 1;
+}
+
 void begin_journey(Level *level_test) {
+    level_test->floor_number = 1;
+    level_test->playerX = level_test->width / 2;
+    level_test->playerY = level_test->height / 2;
+
     if (generate_map(level_test) != 0) {
         printf("Не удалось создать карту!!! \n");
         return;
     }
 
-    render_map(level_test);
+    printf("Этаж %d | wasd (q — выход): ", level_test->floor_number);
     char line[16];
     while (1) {
         render_map(level_test);
         printf("wasd (q — выход): ");
         if (!fgets(line, sizeof line, stdin)) break;   // EOF / ошибка ввода
+        int dx = 0, dy = 0;
         switch (line[0]) {
             case 'q': return;
-            case 'w': move_check(level_test,  0, -1); break;
-            case 's': move_check(level_test,  0, +1); break;
-            case 'a': move_check(level_test, -1,  0); break;
-            case 'd': move_check(level_test, +1,  0); break;
+            case 'w': dy = -1; break;
+            case 's': dy = +1; break;
+            case 'a': dx = -1; break;
+            case 'd': dx = +1; break;
+            default: continue;
+        }
+        if (move_check(level_test, dx, dy)) {
+            apply_fan(level_test);
+            if (check_stairs(level_test) == 2) {
+                printf("Вы вышли из башни на 1-м этаже.\n");
+                return;
+            }
         }
     }
 }
@@ -467,6 +570,7 @@ int main() {
                "[7] Найти предмет в инвентаре\n"
                "[8] Ввести имя пользователя\n"
                "[9] Записать информацию в дневник\n"
+               "[10] Пойти в приключение"
                "\n \n"
         );
 
