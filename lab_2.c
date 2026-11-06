@@ -74,39 +74,62 @@ void time_showcase(GameState game);
 void time_advance(GameState *game);
 
 
-char* generate_map(Level *level_test) {
+int generate_map(Level *level_test) {
     //char *map = calloc(level_test->width * level_test->height, sizeof(*map));
+    free(level_test->mapLocation);
+    level_test->mapLocation = NULL;
     level_test->mapLocation = calloc(level_test->width * level_test->height, 1);
 
     if (level_test->mapLocation == NULL) {
         printf("Что- то пошло не так\n");
-        return NULL;
+        return 1;
     }
 
     for (int y = 0; y < level_test->height; y++) {
         for ( int x = 0; x < level_test->width; x++) {
             int tileId = x + y * level_test->width;
-            if (x == 0 || y == 0 || x == level_test->height-1 || y == level_test->width-1)
+            if (x == 0 || y == 0 || x == level_test->width-1 || y == level_test->height-1)
                 level_test->mapLocation[tileId] = '#';
             else
                 level_test->mapLocation[tileId] = '.';
         }
     }
+    return 0;
 }
 
 
 void render_map(Level *level_test) {
     for (int y = 0; y < level_test->height; y++) {
         for ( int x = 0; x < level_test->width; x++) {
-            putchar(level_test->mapLocation[x + y * level_test->width]);
+            if (x == level_test->playerX && y == level_test->playerY)
+                putchar('@');
+            else
+                putchar(level_test->mapLocation[y * level_test->width + x]);
         }
         putchar('\n');
     }
 }
 
 
+int move_check(Level *level_test, int dx, int dy) {
+    int nx = level_test->playerX + dx;
+    int ny = level_test->playerY + dy;
+
+    if (nx < 0 || nx >= level_test->width)  return 0;
+    if (ny < 0 || ny >= level_test->height) return 0;
+    if (level_test->mapLocation[ny * level_test->width + nx] == '#') return 0;
+
+    level_test->playerX = nx;
+    level_test->playerY = ny;
+    return 1;
+}
+
 void begin_journey(Level *level_test) {
-    generate_map(level_test);
+    if (generate_map(level_test) != 0) {
+        printf("Не удалось создать карту!!! \n");
+        return;
+    }
+
     render_map(level_test);
 }
 
