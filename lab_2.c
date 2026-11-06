@@ -131,7 +131,21 @@ void begin_journey(Level *level_test) {
     }
 
     render_map(level_test);
+    char line[16];
+    while (1) {
+        render_map(level_test);
+        printf("wasd (q — выход): ");
+        if (!fgets(line, sizeof line, stdin)) break;   // EOF / ошибка ввода
+        switch (line[0]) {
+            case 'q': return;
+            case 'w': move_check(level_test,  0, -1); break;
+            case 's': move_check(level_test,  0, +1); break;
+            case 'a': move_check(level_test, -1,  0); break;
+            case 'd': move_check(level_test, +1,  0); break;
+        }
+    }
 }
+
 
 //Чтение файла с списком предметов item_catalogue.txt
 void item_catalog_reader(void) {
