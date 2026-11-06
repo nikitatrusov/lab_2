@@ -38,6 +38,7 @@ typedef struct {
 } MapInfo;
 
 typedef struct {
+    char *mapLocation;
     int width, height;
     int playerX, playerY;
 } Level;
@@ -74,23 +75,30 @@ void time_advance(GameState *game);
 
 
 char* generate_map(Level *level_test) {
-    char *map = calloc(level_test->width * level_test->height, sizeof(*map));
+    //char *map = calloc(level_test->width * level_test->height, sizeof(*map));
+    level_test->mapLocation = calloc(level_test->width * level_test->height, 1);
 
-    if (map == NULL) {
+    if (level_test->mapLocation == NULL) {
         printf("Что- то пошло не так\n");
         return NULL;
     }
 
     for (int y = 0; y < level_test->height; y++) {
         for ( int x = 0; x < level_test->width; x++) {
-            int tileid = x + y * level_test->height;
-            map[tileid] = '#';
+            int tileId = x + y * level_test->width;
+            if (x == 0 || y == 0 || x == level_test->height-1 || y == level_test->width-1)
+                level_test->mapLocation[tileId] = '#';
+            else
+                level_test->mapLocation[tileId] = '.';
         }
     }
+}
 
+
+void render_map(Level *level_test) {
     for (int y = 0; y < level_test->height; y++) {
         for ( int x = 0; x < level_test->width; x++) {
-            putchar(map[x + y * level_test->height]);
+            putchar(level_test->mapLocation[x + y * level_test->width]);
         }
         putchar('\n');
     }
@@ -99,6 +107,7 @@ char* generate_map(Level *level_test) {
 
 void begin_journey(Level *level_test) {
     generate_map(level_test);
+    render_map(level_test);
 }
 
 //Чтение файла с списком предметов item_catalogue.txt
