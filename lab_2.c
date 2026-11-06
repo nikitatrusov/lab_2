@@ -38,10 +38,16 @@ typedef struct {
 } MapInfo;
 
 typedef struct {
-    char **tiles;
     int width, height;
     int playerX, playerY;
 } Level;
+
+Level level_test = {
+    .width = 10,
+    .height = 10,
+    .playerX = 5,
+    .playerY = 5
+};
 
 //Список предметов
 Item item_names[MAX_ITEMS_INGAME];
@@ -66,6 +72,34 @@ void items_index_showcase();
 void time_showcase(GameState game);
 void time_advance(GameState *game);
 
+
+char* generate_map(Level *level_test) {
+    char *map = calloc(level_test->width * level_test->height, sizeof(*map));
+
+    if (map == NULL) {
+        printf("Что- то пошло не так\n");
+        return NULL;
+    }
+
+    for (int y = 0; y < level_test->height; y++) {
+        for ( int x = 0; x < level_test->width; x++) {
+            int tileid = x + y * level_test->height;
+            map[tileid] = '#';
+        }
+    }
+
+    for (int y = 0; y < level_test->height; y++) {
+        for ( int x = 0; x < level_test->width; x++) {
+            putchar(map[x + y * level_test->height]);
+        }
+        putchar('\n');
+    }
+}
+
+
+void begin_journey(Level *level_test) {
+    generate_map(level_test);
+}
 
 //Чтение файла с списком предметов item_catalogue.txt
 void item_catalog_reader(void) {
@@ -428,7 +462,7 @@ int main() {
                 read_map();
                 break;
             case 10:
-
+                begin_journey(&level_test);
                 break;
             default:
                 break;
