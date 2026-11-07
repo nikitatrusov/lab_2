@@ -13,6 +13,10 @@ ToDo 1)Перепроверить вопрос безопасности ввод
 #define MAX_ITEM_NAME_LEN 64    //Длина названия предмета
 #define MAX_USER_NAME_LEN 64    //Длина имени пользователя
 #define MAX_FLOORS 10           //Количество этажей    
+#define T_chance 5
+#define C_chance 5
+#define rand_gen_max 100
+#define rand_gen_min 0
 
 //Инициализация типа данных Item, в дальнейшем необходимо для хранения списка предметов
 typedef struct {
@@ -100,9 +104,9 @@ int generate_map(Level *level_test) {
     for (int y = 1; y < level_test->height-1; y++) {
         for ( int x = 1; x < level_test->width-1; x++) {
             int tileId = x + y * level_test->width;
-            if (randRange(0, 100) < 10)
+            if (randRange(rand_gen_min, rand_gen_max) < T_chance)
                 level_test->mapLocation[tileId] = 'T';
-            if (randRange(0, 100) < 10)
+            if (randRange(rand_gen_min, rand_gen_max) < C_chance)
                 level_test->mapLocation[tileId] = 'C';
         }
     }
@@ -246,6 +250,7 @@ void begin_journey(Level *level_test) {
         if (!fgets(line, sizeof line, stdin)) break;   // EOF / ошибка ввода
         int dx = 0, dy = 0;
         switch (line[0]) {
+            case 'q': break;
             case 'w': dy = -1; break;
             case 's': dy = +1; break;
             case 'a': dx = -1; break;
@@ -254,7 +259,7 @@ void begin_journey(Level *level_test) {
         }
         if (move_check(level_test, dx, dy)) {
             apply_fan(level_test);
-            if (check_stairs(level_test) == 2) {
+            if (check_stairs(level_test) == 2 && line[0] == 'q') {
                 printf("Вы вышли из башни на 1-м этаже.\n");
                 return;
             }
