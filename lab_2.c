@@ -17,6 +17,8 @@ ToDo 1)Перепроверить вопрос безопасности ввод
 #define C_chance 5
 #define rand_gen_max 100
 #define rand_gen_min 0
+#define fly_range 4
+#define max_flight_range 100
 
 //Инициализация типа данных Item, в дальнейшем необходимо для хранения списка предметов
 typedef struct {
@@ -179,7 +181,8 @@ int move_check(Level *level_test, int dx, int dy) {
     level_test->playerX = nx;
     level_test->playerY = ny;
     dx = 0; dy = 0;
-    while (apply_fan(level_test, dx, dy) != 0)
+    int guard = 0;
+    while (apply_fan(level_test, dx, dy) && guard++ < 15)
         apply_fan(level_test, dx, dy);
     return 1;
 }
@@ -216,32 +219,44 @@ int check_stairs(Level *level) {
     return 0;
 }
 
-int apply_fan(Level *level, int dx, int dy) {
-    char here = level->mapLocation[level->playerY][level->playerX];
-
-    switch (here) {
-        case '>': dx = +1; break;
-        case '<': dx = -1; break;
-        case '^': dy = -1; break;
-        case 'v': dy = +1; break;
+int fan_direction(char c, int *dx, int *dy) {
+    switch (c) {
+        case '>': *dx = +1; break;
+        case '<': *dx = -1; break;
+        case '^': *dy = -1; break;
+        case 'v': *dy = +1; break;
         default:  return 0;   // не вентилятор
     }
+}
 
+int apply_fan(Level *level, int dx, int dy) {
+    char here = level->mapLocation[level->playerY][level->playerX];
+    if (!fan_direction(here, &dx, &dy)) return 0;
 
-    for (int step = 0; step < 3; step++) {
+    int moved = 0;
+    int remaining_fly = fly_range;
+    int total = 0;
+
+    while (remaining_fly > 0 && total++ < max_flight_range) {
         int nx = level->playerX + dx;
         int ny = level->playerY + dy;
 
         if (nx < 0 || nx >= level->width)  break;
         if (ny < 0 || ny >= level->height) break;
+        char c = level->mapLocation[ny][nx];
         if (level->mapLocation[ny][nx] == '#') return 0;
         if (level->mapLocation[ny][nx] == 'C') return 0;
         if (level->mapLocation[ny][nx] == 'T') return 0;
 
         level->playerX = nx;
         level->playerY = ny;
+        moved = 1;
+        remaining_fly--;
+
+        if (fan_direction(c, &dx, &dy))
+            remaining_fly = 4;
     }
-    return 1;
+    return moved;
 }
 
 void begin_journey(Level *level_test) {
