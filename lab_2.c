@@ -97,6 +97,16 @@ int generate_map(Level *level_test) {
         }
     }
 
+    for (int y = 1; y < level_test->height-1; y++) {
+        for ( int x = 1; x < level_test->width-1; x++) {
+            int tileId = x + y * level_test->width;
+            if (randRange(0, 100) < 10)
+                level_test->mapLocation[tileId] = 'T';
+            if (randRange(0, 100) < 10)
+                level_test->mapLocation[tileId] = 'C';
+        }
+    }
+
     level_test->mapLocation[level_test->playerY * level_test->width + level_test->playerX] = 'D'; //Лестница на выход
 
     int ux, uy, tries = 0;
@@ -148,6 +158,8 @@ int move_check(Level *level_test, int dx, int dy) {
     if (nx < 0 || nx >= level_test->width)  return 0;
     if (ny < 0 || ny >= level_test->height) return 0;
     if (level_test->mapLocation[ny * level_test->width + nx] == '#') return 0;
+    if (level_test->mapLocation[ny * level_test->width + nx] == 'C') return 0;
+    if (level_test->mapLocation[ny * level_test->width + nx] == 'T') return 0;
 
     level_test->playerX = nx;
     level_test->playerY = ny;
@@ -206,6 +218,8 @@ int apply_fan(Level *level) {
         if (nx < 0 || nx >= level->width)  break;
         if (ny < 0 || ny >= level->height) break;
         if (level->mapLocation[ny * level->width + nx] == '#') break;
+        if (level->mapLocation[ny * level->width + nx] == 'C') break;
+        if (level->mapLocation[ny * level->width + nx] == 'T') break;
 
         level->playerX = nx;
         level->playerY = ny;
@@ -232,7 +246,6 @@ void begin_journey(Level *level_test) {
         if (!fgets(line, sizeof line, stdin)) break;   // EOF / ошибка ввода
         int dx = 0, dy = 0;
         switch (line[0]) {
-            case 'q': return;
             case 'w': dy = -1; break;
             case 's': dy = +1; break;
             case 'a': dx = -1; break;
