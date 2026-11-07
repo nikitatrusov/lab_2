@@ -43,7 +43,7 @@ typedef struct {
 } MapInfo;
 
 typedef struct {
-    char *mapLocation;
+    char **mapLocation;
     int width, height;
     int playerX, playerY;
     int floor_number;
@@ -83,21 +83,32 @@ void time_advance(GameState *game);
 
 int generate_map(Level *level_test) {
     free(level_test->mapLocation);
-    level_test->mapLocation = NULL;
-    level_test->mapLocation = calloc(level_test->width * level_test->height, 1);
+    if (level_test->mapLocation != NULL) {
+        for (int i = 0; i < level_test->height; i++) {
+            free(level_test->mapLocation[i]);
+        }
+        free(level_test->mapLocation);
+        level_test->mapLocation = NULL;
+    }
+
+    level_test->mapLocation = (char**)calloc(level_test->height, sizeof(char*));
 
     if (level_test->mapLocation == NULL) {
         printf("Что- то пошло не так\n");
         return 1;
     }
 
+    for (int i = 0; i < level_test->height; i++) {
+        level_test->mapLocation[i] = (char*)calloc(level_test->width, sizeof(char));
+    }
+    //level_test->mapLocation = calloc(level_test->width * level_test->height, 1);
+
     for (int y = 0; y < level_test->height; y++) {
         for ( int x = 0; x < level_test->width; x++) {
-            int tileId = x + y * level_test->width;
             if (x == 0 || y == 0 || x == level_test->width-1 || y == level_test->height-1)
-                level_test->mapLocation[tileId] = '#';
+                level_test->mapLocation[y][x] = '#';
             else
-                level_test->mapLocation[tileId] = '.';
+                level_test->mapLocation[y][x] = '.';
         }
     }
 
@@ -105,21 +116,21 @@ int generate_map(Level *level_test) {
         for ( int x = 1; x < level_test->width-1; x++) {
             int tileId = x + y * level_test->width;
             if (randRange(rand_gen_min, rand_gen_max) < T_chance)
-                level_test->mapLocation[tileId] = 'T';
+                level_test->mapLocation[y][x] = 'T';
             if (randRange(rand_gen_min, rand_gen_max) < C_chance)
-                level_test->mapLocation[tileId] = 'C';
+                level_test->mapLocation[y][x] = 'C';
         }
     }
 
-    level_test->mapLocation[level_test->playerY * level_test->width + level_test->playerX] = 'D'; //Лестница на выход
+    level_test->mapLocation[level_test->playerY][level_test->playerX] = 'D'; //Лестница на выход
 
     int ux, uy, tries = 0;
     do {
         ux = 1 + rand() % (level_test->width - 2);
         uy = 1 + rand() % (level_test->height - 2);
         tries++;
-    } while (level_test->mapLocation[uy * level_test->width + ux] != '.' && tries < 100);
-    level_test->mapLocation[uy * level_test->width + ux] = 'U';
+    } while (level_test->mapLocation[uy][ux] != '.' && tries < 100);
+    level_test->mapLocation[uy][ux] = 'U';
 
 
     int fans = 2 + rand() % 3;   // 2..4
@@ -129,11 +140,11 @@ int generate_map(Level *level_test) {
             fx = 1 + rand() % (level_test->width - 2);
             fy = 1 + rand() % (level_test->height - 2);
             tries++;
-        } while (level_test->mapLocation[fy * level_test->width + fx] != '.' && tries < 100);
-        if (level_test->mapLocation[fy * level_test->width + fx] != '.') continue;
+        } while (level_test->mapLocation[fy][fx] != '.' && tries < 100);
+        if (level_test->mapLocation[fy][fx] != '.') continue;
 
         const char dirs[] = "><^v";
-        level_test->mapLocation[fy * level_test->width + fx] = dirs[rand() % 4];
+        level_test->mapLocation[fy][fx] = dirs[rand() % 4];
     }
     return 0;
 }
@@ -148,7 +159,7 @@ void render_map(Level *level_test) {
             if (x == level_test->playerX && y == level_test->playerY)
                 putchar('@');
             else
-                putchar(level_test->mapLocation[y * level_test->width + x]);
+                putchar(level_test->mapLocation[y][x]);
         }
         putchar('\n');
     }
@@ -161,9 +172,9 @@ int move_check(Level *level_test, int dx, int dy) {
 
     if (nx < 0 || nx >= level_test->width)  return 0;
     if (ny < 0 || ny >= level_test->height) return 0;
-    if (level_test->mapLocation[ny * level_test->width + nx] == '#') return 0;
-    if (level_test->mapLocation[ny * level_test->width + nx] == 'C') return 0;
-    if (level_test->mapLocation[ny * level_test->width + nx] == 'T') return 0;
+    if (level_test->mapLocation[ny][nx] == '#') return 0;
+    if (level_test->mapLocation[ny][nx] == 'C') return 0;
+    if (level_test->mapLocation[ny][nx] == 'T') return 0;
 
     level_test->playerX = nx;
     level_test->playerY = ny;
@@ -172,7 +183,7 @@ int move_check(Level *level_test, int dx, int dy) {
 
 // 0 — ничего, 1 — поднялся, -1 — спустился, 2 — вышел из логова сатаны
 int check_stairs(Level *level) {
-    char here = level->mapLocation[level->playerY * level->width + level->playerX];
+    char here = level->mapLocation[level->playerY][level->playerX];
 
     if (here == 'U') {
         level->playerX = level->width / 2;
@@ -191,7 +202,7 @@ int check_stairs(Level *level) {
         // игрок начинает на новой U
         for (int y = 1; y < level->height - 1; y++)
             for (int x = 1; x < level->width - 1; x++)
-                if (level->mapLocation[y * level->width + x] == 'U') {
+                if (level->mapLocation[y][x] == 'U') {
                     level->playerX = x;
                     level->playerY = y;
                     return -1;
@@ -203,7 +214,7 @@ int check_stairs(Level *level) {
 }
 
 int apply_fan(Level *level) {
-    char here = level->mapLocation[level->playerY * level->width + level->playerX];
+    char here = level->mapLocation[level->playerY][level->playerX];
 
     int dx = 0, dy = 0;
     switch (here) {
@@ -221,9 +232,9 @@ int apply_fan(Level *level) {
 
         if (nx < 0 || nx >= level->width)  break;
         if (ny < 0 || ny >= level->height) break;
-        if (level->mapLocation[ny * level->width + nx] == '#') break;
-        if (level->mapLocation[ny * level->width + nx] == 'C') break;
-        if (level->mapLocation[ny * level->width + nx] == 'T') break;
+        if (level->mapLocation[ny][nx] == '#') break;
+        if (level->mapLocation[ny][nx] == 'C') break;
+        if (level->mapLocation[ny][nx] == 'T') break;
 
         level->playerX = nx;
         level->playerY = ny;
@@ -242,7 +253,7 @@ void begin_journey(Level *level_test) {
         return;
     }
 
-    printf("Этаж %d | wasd (q — выход): ", level_test->floor_number);
+    printf("Этаж %d | wasd (q — выход): \n", level_test->floor_number);
     char line[16];
     while (1) {
         render_map(level_test);
