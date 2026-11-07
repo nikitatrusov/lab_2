@@ -69,6 +69,7 @@ int map_decoder(const char *encoded, char *decoded, int cap);
 void diary_write(GameState *game);
 void item_catalog_reader(void);
 void read_map(void);
+int apply_fan(Level *level, int dx, int dy);
 
 void inventory_showcase(GameState game);
 void inventory_item_add(GameState *game);
@@ -82,7 +83,6 @@ void time_advance(GameState *game);
 
 
 int generate_map(Level *level_test) {
-    free(level_test->mapLocation);
     if (level_test->mapLocation != NULL) {
         for (int i = 0; i < level_test->height; i++) {
             free(level_test->mapLocation[i]);
@@ -178,6 +178,9 @@ int move_check(Level *level_test, int dx, int dy) {
 
     level_test->playerX = nx;
     level_test->playerY = ny;
+    dx = 0; dy = 0;
+    while (apply_fan(level_test, dx, dy) != 0)
+        apply_fan(level_test, dx, dy);
     return 1;
 }
 
@@ -213,10 +216,9 @@ int check_stairs(Level *level) {
     return 0;
 }
 
-int apply_fan(Level *level) {
+int apply_fan(Level *level, int dx, int dy) {
     char here = level->mapLocation[level->playerY][level->playerX];
 
-    int dx = 0, dy = 0;
     switch (here) {
         case '>': dx = +1; break;
         case '<': dx = -1; break;
@@ -232,14 +234,13 @@ int apply_fan(Level *level) {
 
         if (nx < 0 || nx >= level->width)  break;
         if (ny < 0 || ny >= level->height) break;
-        if (level->mapLocation[ny][nx] == '#') break;
-        if (level->mapLocation[ny][nx] == 'C') break;
-        if (level->mapLocation[ny][nx] == 'T') break;
+        if (level->mapLocation[ny][nx] == '#') return 0;
+        if (level->mapLocation[ny][nx] == 'C') return 0;
+        if (level->mapLocation[ny][nx] == 'T') return 0;
 
         level->playerX = nx;
         level->playerY = ny;
     }
-
     return 1;
 }
 
@@ -269,7 +270,6 @@ void begin_journey(Level *level_test) {
             default: continue;
         }
         if (move_check(level_test, dx, dy)) {
-            apply_fan(level_test);
             if (check_stairs(level_test) == 2 && line[0] == 'q') {
                 printf("Вы вышли из башни на 1-м этаже.\n");
                 return;
