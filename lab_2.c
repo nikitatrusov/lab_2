@@ -20,6 +20,14 @@ ToDo 1)Перепроверить вопрос безопасности ввод
 #define fly_range 4
 #define max_flight_range 100
 
+typedef enum {
+    DIR_NONE = 0,
+    DIR_UP,
+    DIR_DOWN,
+    DIR_LEFT,
+    DIR_RIGHT
+} Direction;
+
 //Инициализация типа данных Item, в дальнейшем необходимо для хранения списка предметов
 typedef struct {
     int id;
@@ -36,6 +44,16 @@ typedef struct {
     int inventory[MAX_INV_SIZE];
 } GameState;
 
+typedef struct {
+    int max_health;
+    int cur_health;
+    int max_stamina;
+    int cur_stamina;
+    int gold;
+    int playerX, playerY;
+    char player_name[64];
+} Player;
+
 //Информация о карте
 typedef struct {
     int size_x;
@@ -47,16 +65,23 @@ typedef struct {
 typedef struct {
     char **mapLocation;
     int width, height;
-    int playerX, playerY;
     int floor_number;
 } Level;
 
 Level level_test = {
     .width = 10,
     .height = 10,
-    .playerX = 5,
-    .playerY = 5,
     .floor_number = 1
+};
+
+Player dodikjan = {
+    .max_health = 100,
+    .cur_health = 100,
+    .max_stamina = 50,
+    .cur_stamina = 50,
+    .gold = 0,
+    .playerX = 5,
+    .playerY = 5
 };
 
 //Список предметов
@@ -71,7 +96,7 @@ int map_decoder(const char *encoded, char *decoded, int cap);
 void diary_write(GameState *game);
 void item_catalog_reader(void);
 void read_map(void);
-int apply_fan(Level *level, int dx, int dy);
+int apply_fan(Level *level, int dx, int dy, Player *dodikjan);
 
 void inventory_showcase(GameState game);
 void inventory_item_add(GameState *game);
@@ -84,7 +109,7 @@ void time_showcase(GameState game);
 void time_advance(GameState *game);
 
 
-int generate_map(Level *level_test) {
+int generate_map(Level *level_test, Player *dodikjan) {
     if (level_test->mapLocation != NULL) {
         for (int i = 0; i < level_test->height; i++) {
             free(level_test->mapLocation[i]);
@@ -124,7 +149,7 @@ int generate_map(Level *level_test) {
         }
     }
 
-    level_test->mapLocation[level_test->playerY][level_test->playerX] = 'D'; //Лестница на выход
+    level_test->mapLocation[dodikjan->playerY][dodikjan->playerX] = 'D'; //Лестница на выход
 
     int ux, uy, tries = 0;
     do {
@@ -155,10 +180,10 @@ int generate_map(Level *level_test) {
 
 
 
-void render_map(Level *level_test) {
+void render_map(Level *level_test, Player *dodikjan) {
     for (int y = 0; y < level_test->height; y++) {
         for ( int x = 0; x < level_test->width; x++) {
-            if (x == level_test->playerX && y == level_test->playerY)
+            if (x == dodikjan->playerX && y == dodikjan->playerY)
                 putchar('@');
             else
                 putchar(level_test->mapLocation[y][x]);
@@ -168,9 +193,9 @@ void render_map(Level *level_test) {
 }
 
 
-int move_check(Level *level_test, int dx, int dy) {
-    int nx = level_test->playerX + dx;
-    int ny = level_test->playerY + dy;
+int move_check(Level *level_test, int dx, int dy, Player *dodikjan) {
+    int nx = dodikjan->playerX + dx;
+    int ny = dodikjan->playerY + dy;
 
     if (nx < 0 || nx >= level_test->width)  return 0;
     if (ny < 0 || ny >= level_test->height) return 0;
@@ -178,23 +203,23 @@ int move_check(Level *level_test, int dx, int dy) {
     if (level_test->mapLocation[ny][nx] == 'C') return 0;
     if (level_test->mapLocation[ny][nx] == 'T') return 0;
 
-    level_test->playerX = nx;
-    level_test->playerY = ny;
+    dodikjan->playerX = nx;
+    dodikjan->playerY = ny;
     dx = 0; dy = 0;
     int guard = 0;
-    while (apply_fan(level_test, dx, dy) && guard++ < 15)
-        apply_fan(level_test, dx, dy);
+    while (apply_fan(level_test, dx, dy, dodikjan) && guard++ < 15)
+        apply_fan(level_test, dx, dy, dodikjan);
     return 1;
 }
 
 // 0 — ничего, 1 — поднялся, -1 — спустился, 2 — вышел из логова сатаны
-int check_stairs(Level *level) {
-    char here = level->mapLocation[level->playerY][level->playerX];
+int check_stairs(Level *level, Player *dodikjan) {
+    char here = level->mapLocation[dodikjan->playerY][dodikjan->playerX];
 
     if (here == 'U') {
-        level->playerX = level->width / 2;
-        level->playerY = level->height / 2;
-        if (generate_map(level) != 0) return -1;
+        dodikjan->playerX = level->width / 2;
+        dodikjan->playerY = level->height / 2;
+        if (generate_map(level, dodikjan) != 0) return -1;
         level->floor_number++;
         return 1;
     }
@@ -204,13 +229,13 @@ int check_stairs(Level *level) {
             return 2;   // вышел из башни
         }
         level->floor_number--;
-        if (generate_map(level) != 0) return -1;
+        if (generate_map(level, dodikjan) != 0) return -1;
         // игрок начинает на новой U
         for (int y = 1; y < level->height - 1; y++)
             for (int x = 1; x < level->width - 1; x++)
                 if (level->mapLocation[y][x] == 'U') {
-                    level->playerX = x;
-                    level->playerY = y;
+                    dodikjan->playerX = x;
+                    dodikjan->playerY = y;
                     return -1;
                 }
         return -1;
@@ -229,8 +254,8 @@ int fan_direction(char c, int *dx, int *dy) {
     }
 }
 
-int apply_fan(Level *level, int dx, int dy) {
-    char here = level->mapLocation[level->playerY][level->playerX];
+int apply_fan(Level *level, int dx, int dy, Player *dodikjan) {
+    char here = level->mapLocation[dodikjan->playerY][dodikjan->playerX];
     if (!fan_direction(here, &dx, &dy)) return 0;
 
     int moved = 0;
@@ -238,8 +263,8 @@ int apply_fan(Level *level, int dx, int dy) {
     int total = 0;
 
     while (remaining_fly > 0 && total++ < max_flight_range) {
-        int nx = level->playerX + dx;
-        int ny = level->playerY + dy;
+        int nx = dodikjan->playerX + dx;
+        int ny = dodikjan->playerY + dy;
 
         if (nx < 0 || nx >= level->width)  break;
         if (ny < 0 || ny >= level->height) break;
@@ -248,8 +273,8 @@ int apply_fan(Level *level, int dx, int dy) {
         if (level->mapLocation[ny][nx] == 'C') return 0;
         if (level->mapLocation[ny][nx] == 'T') return 0;
 
-        level->playerX = nx;
-        level->playerY = ny;
+        dodikjan->playerX = nx;
+        dodikjan->playerY = ny;
         moved = 1;
         remaining_fly--;
 
@@ -259,12 +284,13 @@ int apply_fan(Level *level, int dx, int dy) {
     return moved;
 }
 
-void begin_journey(Level *level_test) {
-    level_test->floor_number = 1;
-    level_test->playerX = level_test->width / 2;
-    level_test->playerY = level_test->height / 2;
+void begin_journey(Level *level_test, Player *dodikjan) {
 
-    if (generate_map(level_test) != 0) {
+    level_test->floor_number = 1;
+    dodikjan->playerX = level_test->width / 2;
+    dodikjan->playerY = level_test->height / 2;
+
+    if (generate_map(level_test, dodikjan) != 0) {
         printf("Не удалось создать карту!!! \n");
         return;
     }
@@ -272,7 +298,7 @@ void begin_journey(Level *level_test) {
     printf("Этаж %d | wasd (q — выход): \n", level_test->floor_number);
     char line[16];
     while (1) {
-        render_map(level_test);
+        render_map(level_test, dodikjan);
         printf("wasd (q — выход): ");
         if (!fgets(line, sizeof line, stdin)) break;   // EOF / ошибка ввода
         int dx = 0, dy = 0;
@@ -284,8 +310,8 @@ void begin_journey(Level *level_test) {
             case 'd': dx = +1; break;
             default: continue;
         }
-        if (move_check(level_test, dx, dy)) {
-            if (check_stairs(level_test) == 2 && line[0] == 'q') {
+        if (move_check(level_test, dx, dy, dodikjan)) {
+            if (check_stairs(level_test, dodikjan) == 2 && line[0] == 'q') {
                 printf("Вы вышли из башни на 1-м этаже.\n");
                 return;
             }
@@ -656,7 +682,7 @@ int main() {
                 read_map();
                 break;
             case 10:
-                begin_journey(&level_test);
+                begin_journey(&level_test, &dodikjan);
                 break;
             default:
                 break;
