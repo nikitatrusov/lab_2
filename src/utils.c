@@ -83,7 +83,7 @@ void time_advance(GameState *game) {
 //Чтение файла с списком предметов item_catalogue.txt
 void item_catalog_reader(void) {
 
-    FILE *file = fopen("item_catalogue.txt", "r");
+    FILE *file = fopen("../item_catalogue.txt", "r");
 
     if (file == NULL) {
         perror("Не удалось найти файл");
@@ -107,7 +107,7 @@ void item_catalog_reader(void) {
 //Запись состояния игры в файл diary.txt
 void diary_write(GameState *game) {
 
-    FILE *file = fopen("diary.txt", "a");
+    FILE *file = fopen("../diary.txt", "a");
 
     if (file == NULL) {
         perror("Не создать найти файл");

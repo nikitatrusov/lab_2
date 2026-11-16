@@ -1,11 +1,7 @@
 #ifndef MAP_H
 #define MAP_H
 
-extern Item item_names;
 
-extern char user_name;
-extern int inventory;
-int rand_range
 typedef enum {
     DIR_NONE = 0,
     DIR_UP,
@@ -58,6 +54,17 @@ typedef struct {
 
 static const int DIR_DX[DIR_COUNT] = { 0, 0, 0, -1, 1 };
 static const int DIR_DY[DIR_COUNT] = { 0, -1, 1, 0, 0 };
+
+int generate_map(Level *level_test, Player *dodikjan);
+void render_map(Level *level_test, Player *dodikjan);
+int move_check(Level *level_test, Direction dir, Player *dodikjan);
+int check_stairs(Level *level, Player *dodikjan);
+int fan_direction(char c, int *dx, int *dy);
+int apply_fan(Level *level, Player *dodikjan);
+void begin_journey(Level *level_test, Player *dodikjan);
+void read_map(void);
+int map_decoder(const char *encoded, char *decoded, int cap);
+
 
 #define T_chance 5
 #define C_chance 5
