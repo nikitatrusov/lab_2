@@ -1,6 +1,19 @@
 #include "utils.h"
 
+//Список предметов
+Item item_names[MAX_ITEMS_INGAME];
 
+char user_name[MAX_USER_NAME_LEN];
+int inventory[MAX_INV_SIZE] = {0};
+
+    
+GameState game = {
+    .current_hour = 8,
+    .current_day = 1,
+    .gameState = 0,
+    .user_name = "Незнакомец",
+    .inventory = {0}
+};
 
 //Функция проверки ввода для числовых значений
 int failsafe_sys_numbers(const char *message_text) {

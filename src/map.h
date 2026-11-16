@@ -1,6 +1,11 @@
 #ifndef MAP_H
 #define MAP_H
 
+extern Item item_names;
+
+extern char user_name;
+extern int inventory;
+int rand_range
 typedef enum {
     DIR_NONE = 0,
     DIR_UP,

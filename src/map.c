@@ -2,6 +2,7 @@
 #include "player.h"
 #include <stdio.h>
 #include "player.h"
+#include "utils.h"
 
 
 int generate_map(Level *level_test, Player *dodikjan) {
