@@ -3,7 +3,7 @@
 
 
 
-typedef struct Player{
+typedef struct {
     int max_health;
     int cur_health;
     int max_stamina;
