@@ -1,7 +1,5 @@
-#ifndef MAP.H
-#define MAP.H
-
-#endif
+#ifndef MAP_H
+#define MAP_H
 
 typedef enum {
     DIR_NONE = 0,
@@ -52,3 +50,16 @@ typedef struct {
     int size_z;
     char map_name[100]; //Временно для тестов!!!!!
 } MapInfo;
+
+static const int DIR_DX[DIR_COUNT] = { 0, 0, 0, -1, 1 };
+static const int DIR_DY[DIR_COUNT] = { 0, -1, 1, 0, 0 };
+
+#define T_chance 5
+#define C_chance 5
+#define rand_gen_max 100
+#define rand_gen_min 0
+#define MAX_FLOORS 10           //Количество этажей    
+#define fly_range 4
+#define max_flight_range 100
+
+#endif

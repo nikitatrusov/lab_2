@@ -1,6 +1,7 @@
 #include "map.h"
-
-
+#include "player.h"
+#include <stdio.h>
+#include "player.h"
 
 
 int generate_map(Level *level_test, Player *dodikjan) {

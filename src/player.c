@@ -1,5 +1,5 @@
 #include "player.h"
-
+#include "utils.h"
 
 //Вывод инвентаря на экран
 void inventory_showcase(GameState game) {
