@@ -6,6 +6,7 @@ int main() {
     int gameState = 0;
     int activeCall;
 
+    init_player();
 
     //Чтобы не съедало кириллицу powershell'ом
     SetConsoleCP(65001);      // Ввод в UTF-8
@@ -36,6 +37,7 @@ int main() {
         switch(activeCall) {
             case 0:
                 gameState = 1;
+                free(Nikra);
                 break;
             case 1:
                 time_showcase(game);
@@ -69,7 +71,7 @@ int main() {
                 read_map();
                 break;
             case 10:
-                begin_journey(&level_test, &dodikjan);
+                begin_journey(&level_test, Nikra);
                 break;
             default:
                 break;

@@ -1,16 +1,26 @@
 #include "player.h"
 #include "utils.h"
 
+Player *Nikra = NULL;
 
-Player dodikjan = {
-    .max_health = 100,
-    .cur_health = 100,
-    .max_stamina = 50,
-    .cur_stamina = 50,
-    .gold = 0,
-    .playerX = 5,
-    .playerY = 5
-};
+void init_player(void) {
+    Nikra = (Player*)malloc(sizeof(Player));
+
+    if (Nikra == NULL) {
+        printf("Ошибка выделения памяти!\n");
+        exit(1);
+    }
+
+    Nikra->max_health = 100;
+    Nikra->cur_health = 100;
+    Nikra->max_stamina = 50;
+    Nikra->cur_stamina = 50;
+    Nikra->gold = 0;
+    Nikra->playerX = 5;
+    Nikra->playerY = 5;
+
+}
+
 
 //Вывод инвентаря на экран
 void inventory_showcase(GameState game) {

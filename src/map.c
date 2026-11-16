@@ -5,7 +5,7 @@
 #include "utils.h"
 
 
-int generate_map(Level *level_test, Player *dodikjan) {
+int generate_map(Level *level_test, Player *Nikra) {
     if (level_test->mapLocation != NULL) {
         for (int i = 0; i < level_test->height; i++) {
             free(level_test->mapLocation[i]);
@@ -45,7 +45,7 @@ int generate_map(Level *level_test, Player *dodikjan) {
         }
     }
 
-    level_test->mapLocation[dodikjan->playerY][dodikjan->playerX] = 'D'; //Лестница на выход
+    level_test->mapLocation[Nikra->playerY][Nikra->playerX] = 'D'; //Лестница на выход
 
     int ux, uy, tries = 0;
     do {
@@ -76,10 +76,10 @@ int generate_map(Level *level_test, Player *dodikjan) {
 
 
 
-void render_map(Level *level_test, Player *dodikjan) {
+void render_map(Level *level_test, Player *Nikra) {
     for (int y = 0; y < level_test->height; y++) {
         for ( int x = 0; x < level_test->width; x++) {
-            if (x == dodikjan->playerX && y == dodikjan->playerY)
+            if (x == Nikra->playerX && y == Nikra->playerY)
                 putchar('@');
             else
                 putchar(level_test->mapLocation[y][x]);
@@ -89,9 +89,9 @@ void render_map(Level *level_test, Player *dodikjan) {
 }
 
 
-int move_check(Level *level_test, Direction dir, Player *dodikjan) {
-    int nx = dodikjan->playerX + DIR_DX[dir];
-    int ny = dodikjan->playerY + DIR_DY[dir];
+int move_check(Level *level_test, Direction dir, Player *Nikra) {
+    int nx = Nikra->playerX + DIR_DX[dir];
+    int ny = Nikra->playerY + DIR_DY[dir];
 
     if (nx < 0 || nx >= level_test->width)  return 0;
     if (ny < 0 || ny >= level_test->height) return 0;
@@ -99,21 +99,21 @@ int move_check(Level *level_test, Direction dir, Player *dodikjan) {
     if (level_test->mapLocation[ny][nx] == 'C') return 0;
     if (level_test->mapLocation[ny][nx] == 'T') return 0;
 
-    dodikjan->playerX = nx;
-    dodikjan->playerY = ny;
+    Nikra->playerX = nx;
+    Nikra->playerY = ny;
     int guard = 0;
-    while (apply_fan(level_test, dodikjan) && guard++ < 15) {}
+    while (apply_fan(level_test, Nikra) && guard++ < 15) {}
     return 1;
 }
 
 // 0 — ничего, 1 — поднялся, -1 — спустился, 2 — вышел из логова сатаны
-int check_stairs(Level *level, Player *dodikjan) {
-    char here = level->mapLocation[dodikjan->playerY][dodikjan->playerX];
+int check_stairs(Level *level, Player *Nikra) {
+    char here = level->mapLocation[Nikra->playerY][Nikra->playerX];
 
     if (here == 'U') {
-        dodikjan->playerX = level->width / 2;
-        dodikjan->playerY = level->height / 2;
-        if (generate_map(level, dodikjan) != 0) return -1;
+        Nikra->playerX = level->width / 2;
+        Nikra->playerY = level->height / 2;
+        if (generate_map(level, Nikra) != 0) return -1;
         level->floor_number++;
         return 1;
     }
@@ -123,13 +123,13 @@ int check_stairs(Level *level, Player *dodikjan) {
             return 2;   // вышел из башни
         }
         level->floor_number--;
-        if (generate_map(level, dodikjan) != 0) return -1;
+        if (generate_map(level, Nikra) != 0) return -1;
         // игрок начинает на новой U
         for (int y = 1; y < level->height - 1; y++)
             for (int x = 1; x < level->width - 1; x++)
                 if (level->mapLocation[y][x] == 'U') {
-                    dodikjan->playerX = x;
-                    dodikjan->playerY = y;
+                    Nikra->playerX = x;
+                    Nikra->playerY = y;
                     return -1;
                 }
         return -1;
@@ -148,8 +148,8 @@ int fan_direction(char c, int *dx, int *dy) {
     }
 }
 
-int apply_fan(Level *level, Player *dodikjan) {
-    Direction dir = dir_from_fan(level->mapLocation[dodikjan->playerY][dodikjan->playerX]);
+int apply_fan(Level *level, Player *Nikra) {
+    Direction dir = dir_from_fan(level->mapLocation[Nikra->playerY][Nikra->playerX]);
     if (dir == DIR_NONE) return 0;
 
     int moved = 0;
@@ -157,8 +157,8 @@ int apply_fan(Level *level, Player *dodikjan) {
     int total = 0;
 
     while (remaining_fly > 0 && total++ < max_flight_range) {
-        int nx = dodikjan->playerX + DIR_DX[dir];
-        int ny = dodikjan->playerY + DIR_DY[dir];
+        int nx = Nikra->playerX + DIR_DX[dir];
+        int ny = Nikra->playerY + DIR_DY[dir];
 
         if (nx < 0 || nx >= level->width)  break;
         if (ny < 0 || ny >= level->height) break;
@@ -167,8 +167,8 @@ int apply_fan(Level *level, Player *dodikjan) {
         if (level->mapLocation[ny][nx] == 'C') return 0;
         if (level->mapLocation[ny][nx] == 'T') return 0;
 
-        dodikjan->playerX = nx;
-        dodikjan->playerY = ny;
+        Nikra->playerX = nx;
+        Nikra->playerY = ny;
         moved = 1;
         remaining_fly--;
 
@@ -178,13 +178,13 @@ int apply_fan(Level *level, Player *dodikjan) {
     return moved;
 }
 
-void begin_journey(Level *level_test, Player *dodikjan) {
+void begin_journey(Level *level_test, Player *Nikra) {
 
     level_test->floor_number = 1;
-    dodikjan->playerX = level_test->width / 2;
-    dodikjan->playerY = level_test->height / 2;
+    Nikra->playerX = level_test->width / 2;
+    Nikra->playerY = level_test->height / 2;
 
-    if (generate_map(level_test, dodikjan) != 0) {
+    if (generate_map(level_test, Nikra) != 0) {
         printf("Не удалось создать карту!!! \n");
         return;
     }
@@ -192,12 +192,12 @@ void begin_journey(Level *level_test, Player *dodikjan) {
     printf("Этаж %d | wasd (q — выход): \n", level_test->floor_number);
     char line[16];
     while (1) {
-        render_map(level_test, dodikjan);
+        render_map(level_test, Nikra);
         printf("wasd (q — выход): ");
         if (!fgets(line, sizeof line, stdin)) break;   // EOF / ошибка ввода
 
         if (line[0] == 'q') {
-            if (check_stairs(level_test, dodikjan) == 2) {
+            if (check_stairs(level_test, Nikra) == 2) {
                 printf("Вы вышли из башни на 1-м этаже. \n");
                 return;
             }
@@ -207,8 +207,8 @@ void begin_journey(Level *level_test, Player *dodikjan) {
         Direction dir = dir_from_key(line[0]);
         if (dir == DIR_NONE) continue;
 
-        if (move_check(level_test, dir, dodikjan))
-            check_stairs(level_test, dodikjan);
+        if (move_check(level_test, dir, Nikra))
+            check_stairs(level_test, Nikra);
     }
 }
 

@@ -1,5 +1,6 @@
 #ifndef PLAYER_H
-#define PlAYER_H
+#define PLAYER_H
+
 
 
 typedef struct Player{
@@ -11,5 +12,7 @@ typedef struct Player{
     int playerX, playerY;
     char player_name[64];
 } Player;
+
+extern Player *Nikra;
 
 #endif
