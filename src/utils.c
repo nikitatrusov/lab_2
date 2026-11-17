@@ -1,4 +1,5 @@
 #include "utils.h"
+#include "player.h"
 
 //Список предметов
 Item item_names[MAX_ITEMS_INGAME];
@@ -11,7 +12,6 @@ GameState game = {
     .current_hour = 8,
     .current_day = 1,
     .gameState = 0,
-    .user_name = "Незнакомец",
     .inventory = {0}
 };
 
@@ -105,7 +105,7 @@ void item_catalog_reader(void) {
 }
 
 //Запись состояния игры в файл diary.txt
-void diary_write(GameState *game) {
+void diary_write(GameState *game, Player Nikra) {
 
     FILE *file = fopen("../diary.txt", "a");
 
@@ -114,7 +114,7 @@ void diary_write(GameState *game) {
         fclose(file);
     } else {
         printf("Файл найден");
-        fprintf(file, "Имя: %s, Сейчас %d часов %2d-го дня\n", game->user_name, game->current_hour, game->current_day);
+        fprintf(file, "Имя: %s, Сейчас %d часов %2d-го дня\n", Nikra.player_name, game->current_hour, game->current_day);
         for (int i = 0; i < MAX_INV_SIZE; i++) {
             fprintf(file, "Слот %d: [%d] (%s)\n", i, game->inventory[i], item_names[game->inventory[i]].name);
             

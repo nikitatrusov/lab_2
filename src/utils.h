@@ -6,7 +6,6 @@
 #include <stdio.h>
 #define MAX_ITEMS_INGAME 10     //количество предметов в проекте
 #define MAX_INV_SIZE 10         //размер инвентаря
-#define MAX_USER_NAME_LEN 64    //Длина имени пользователя
 
 //Основная структура данных игры
 typedef struct GameState{
@@ -14,7 +13,6 @@ typedef struct GameState{
     int current_day;
     int gameState;
     int activeCall;
-    char user_name[MAX_USER_NAME_LEN];
     int inventory[MAX_INV_SIZE];
 } GameState;
 
@@ -35,6 +33,6 @@ void failsafe_sys_russian(const char *message_text, char *out_message, size_t ma
 void time_showcase(GameState game);
 void time_advance(GameState *game);
 void item_catalog_reader(void);
-void diary_write(GameState *game);
+void diary_write(GameState *game, Player Nikra);
 
 #endif

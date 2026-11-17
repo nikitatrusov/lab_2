@@ -3,13 +3,15 @@
 
 Player *Nikra = NULL;
 
-void init_player(void) {
+void character_creation() {
     Nikra = (Player*)malloc(sizeof(Player));
 
     if (Nikra == NULL) {
         printf("Ошибка выделения памяти!\n");
         exit(1);
     }
+
+    failsafe_sys_russian("Приветствую тебя, фермер. Как тебя зовут?\n", Nikra->player_name, sizeof(Nikra->player_name));
 
     Nikra->max_health = 100;
     Nikra->cur_health = 100;
@@ -130,4 +132,8 @@ void inventory_favorite_item_showcase(GameState game) {
         }
     }
     printf("Любимый предмет: %s, он встречается %d раз\n", item_names[fav_item].name, max_count);
+}
+
+void character_showcase() {
+
 }

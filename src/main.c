@@ -6,13 +6,13 @@ int main() {
     int gameState = 0;
     int activeCall;
 
-    init_player();
 
     //Чтобы не съедало кириллицу powershell'ом
     SetConsoleCP(65001);      // Ввод в UTF-8
     SetConsoleOutputCP(65001); // Вывод в UTF-8
 
     item_catalog_reader();
+    character_creation();
 
     while (gameState == 0) {
 
@@ -61,14 +61,13 @@ int main() {
                 inventory_item_search_via_name(game);
                 break;
             case 8:
-                failsafe_sys_russian("Приветствую тебя, фермер. Как тебя зовут?\n", user_name, sizeof(user_name));
-                printf("Привет, %s", game.user_name);
+                printf("Привет, %s", Nikra->player_name);
                 break;
             case 9:
-                diary_write(&game);
+                diary_write(&game, *Nikra);
                 char decoded[1000];
                 printf("\n");
-                read_map();
+                //read_map();
                 break;
             case 10:
                 begin_journey(&level_test, Nikra);
