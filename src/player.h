@@ -1,7 +1,7 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
-#define MAX_USER_NAME_LEN 64    //Длина имени пользователя
+#include "utils.h"
 
 
 typedef struct {
@@ -15,5 +15,6 @@ typedef struct {
 } Player;
 
 extern Player *Nikra;
+extern GameState game;
 
 #endif

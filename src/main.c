@@ -62,9 +62,11 @@ int main() {
                 break;
             case 8:
                 printf("Привет, %s", Nikra->player_name);
+                character_showcase();
                 break;
             case 9:
-                diary_write(&game, *Nikra);
+                character_creation();
+                diary_write(&game);
                 char decoded[1000];
                 printf("\n");
                 //read_map();
