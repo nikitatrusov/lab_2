@@ -33,6 +33,7 @@ int failsafe_sys_numbers(const char *message_text);
 void failsafe_sys_russian(const char *message_text, char *out_message, size_t max_bytes);
 void time_showcase(GameState game);
 void time_advance(GameState *game);
+void time_sleep(GameState *game);
 void item_catalog_reader(void);
 void diary_write(GameState *game);
 

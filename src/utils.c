@@ -77,7 +77,7 @@ void time_advance(GameState *game) {
 
     while (hours !=0) {
         if (game->current_hour == 2) {
-            printf("Ты не можешь отдыхать ночью, ночью нужно спать");
+            printf("Ты не можешь отдыхать ночью, ночью нужно спать\n");
             break;
         }
 
@@ -86,6 +86,13 @@ void time_advance(GameState *game) {
         game->current_hour = game->current_hour % 24;
         hours--;
     }
+}
+
+
+void time_sleep(GameState *game) {
+    printf("Доброе утро фермер, за работу!\n");
+    game->current_hour = 8;
+    game->current_day++;
 }
 
 
