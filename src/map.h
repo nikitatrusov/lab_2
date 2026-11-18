@@ -1,6 +1,7 @@
 #ifndef MAP_H
 #define MAP_H
 
+#define STAMINA_JOURNEY_MIN 10          //Минимальный показатель в расчетах выносливости для путешествия
 
 typedef enum {
     DIR_NONE = 0,
@@ -61,7 +62,7 @@ int move_check(Level *level_test, Direction dir, Player *Nikra);
 int check_stairs(Level *level, Player *Nikra);
 int fan_direction(char c, int *dx, int *dy);
 int apply_fan(Level *level, Player *Nikra);
-void begin_journey(Level *level_test, Player *Nikra);
+void begin_journey(Level *level_test, Player *Nikra, GameState game);
 void read_map(void);
 int map_decoder(const char *encoded, char *decoded, int cap);
 

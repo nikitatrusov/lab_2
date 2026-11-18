@@ -9,7 +9,7 @@ int inventory[MAX_INV_SIZE] = {0};
 
     
 GameState game = {
-    .current_hour = 8,
+    .current_hour = 4,
     .current_day = 1,
     .gameState = 0,
     .inventory = {0}
@@ -138,3 +138,4 @@ void diary_write(GameState *game) {
     }
     fclose(file);
 }
+

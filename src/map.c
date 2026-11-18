@@ -5,6 +5,23 @@
 #include "utils.h"
 
 
+int journey_check(GameState game, Player *Nikra) {
+    if (Nikra == NULL) {
+        printf("Создай персонажа прежде чем идти в поход\n");
+        return 0;
+    }
+    else if (game.current_hour >= 2 && game.current_hour <= 8) {
+        printf("Ты не можешь отправится в приключение ночью, дождись утра\n");
+        return 0;
+    }
+    else if (STAMINA_JOURNEY_MIN <= Nikra->max_stamina / Nikra->cur_stamina) {
+        printf("Ты слишком устал, нужно иметь больше 10% выносливости для начала приключения.\n");
+        return 0;
+    }
+    return 1;
+}
+
+
 int generate_map(Level *level_test, Player *Nikra) {
     if (level_test->mapLocation != NULL) {
         for (int i = 0; i < level_test->height; i++) {
@@ -178,7 +195,11 @@ int apply_fan(Level *level, Player *Nikra) {
     return moved;
 }
 
-void begin_journey(Level *level_test, Player *Nikra) {
+void begin_journey(Level *level_test, Player *Nikra, GameState game) {
+
+    if (journey_check(game, Nikra) == 0) {
+        return;
+    }
 
     level_test->floor_number = 1;
     Nikra->playerX = level_test->width / 2;
