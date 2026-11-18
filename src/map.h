@@ -59,10 +59,10 @@ static const int DIR_DY[DIR_COUNT] = { 0, -1, 1, 0, 0 };
 int generate_map(Level *level_test, Player *Nikra);
 void render_map(Level *level_test, Player *Nikra);
 int move_check(Level *level_test, Direction dir, Player *Nikra);
-int check_stairs(Level *level, Player *Nikra);
+int check_stairs(Level *level, Player *Nikra, GameState *game);
 int fan_direction(char c, int *dx, int *dy);
 int apply_fan(Level *level, Player *Nikra);
-void begin_journey(Level *level_test, Player *Nikra, GameState game);
+void begin_journey(Level *level_test, Player *Nikra, GameState *game);
 void read_map(void);
 int map_decoder(const char *encoded, char *decoded, int cap);
 

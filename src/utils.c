@@ -89,6 +89,13 @@ void time_advance(GameState *game) {
 }
 
 
+void time_advance_formap(GameState *game) {
+        game->current_hour++;
+        game->current_day += game->current_hour / 24;
+        game->current_hour = game->current_hour % 24;
+}
+
+
 void time_sleep(GameState *game) {
     printf("Доброе утро фермер, за работу!\n");
     game->current_hour = 8;

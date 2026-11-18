@@ -91,7 +91,7 @@ int generate_map(Level *level_test, Player *Nikra) {
 
 
 void render_hud(GameState *game, Player *Nikra, Level *level_test) {
-    printf("\nHP: %i/%2i | Выносливость: %d/%2d | Золото: %3i | Этаж: %4i | Время: %05i:00\n", 
+    printf("\nHP: %i/%2i | Выносливость: %d/%2d | Золото: %3i | Этаж: %4i | Время: %02i:00\n", 
             Nikra->cur_health, Nikra->max_health,
             Nikra->cur_stamina, Nikra->max_stamina,
             Nikra->gold,
@@ -133,10 +133,12 @@ int move_check(Level *level_test, Direction dir, Player *Nikra) {
 }
 
 // 0 — ничего, 1 — поднялся, -1 — спустился, 2 — вышел из логова сатаны
-int check_stairs(Level *level, Player *Nikra) {
+int check_stairs(Level *level, Player *Nikra, GameState *game) {
     char here = level->mapLocation[Nikra->playerY][Nikra->playerX];
 
     if (here == 'U') {
+        Nikra->cur_stamina = Nikra->cur_stamina-4;
+        time_advance_formap(game);
         Nikra->playerX = level->width / 2;
         Nikra->playerY = level->height / 2;
         if (generate_map(level, Nikra) != 0) return -1;
@@ -204,9 +206,9 @@ int apply_fan(Level *level, Player *Nikra) {
     return moved;
 }
 
-void begin_journey(Level *level_test, Player *Nikra, GameState game) {
+void begin_journey(Level *level_test, Player *Nikra, GameState *game) {
 
-    if (journey_check(game, Nikra) == 0) {
+    if (journey_check(*game, Nikra) == 0) {
         return;
     }
 
@@ -222,13 +224,13 @@ void begin_journey(Level *level_test, Player *Nikra, GameState game) {
     printf("Этаж %d | wasd (q — выход): \n", level_test->floor_number);
     char line[16];
     while (1) {
-        render_hud(&game, Nikra, level_test);
+        render_hud(game, Nikra, level_test);
         render_map(level_test, Nikra);
         printf("wasd (q — выход): ");
         if (!fgets(line, sizeof line, stdin)) break;   // EOF / ошибка ввода
 
         if (line[0] == 'q') {
-            if (check_stairs(level_test, Nikra) == 2) {
+            if (check_stairs(level_test, Nikra, game) == 2) {
                 printf("Вы вышли из башни на 1-м этаже. \n");
                 return;
             }
@@ -239,7 +241,8 @@ void begin_journey(Level *level_test, Player *Nikra, GameState game) {
         if (dir == DIR_NONE) continue;
 
         if (move_check(level_test, dir, Nikra))
-            check_stairs(level_test, Nikra);
+            Nikra->cur_stamina--;
+            check_stairs(level_test, Nikra, game);
     }
 }
 

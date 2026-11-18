@@ -36,5 +36,6 @@ void time_advance(GameState *game);
 void time_sleep(GameState *game);
 void item_catalog_reader(void);
 void diary_write(GameState *game);
+void time_advance_formap(GameState *game);
 
 #endif

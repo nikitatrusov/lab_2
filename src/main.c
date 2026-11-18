@@ -72,7 +72,7 @@ int main() {
                 //read_map();
                 break;
             case 10:
-                begin_journey(&level_test, Nikra, game);
+                begin_journey(&level_test, Nikra, &game);
                 break;
             case 11:
                 time_sleep(&game);
