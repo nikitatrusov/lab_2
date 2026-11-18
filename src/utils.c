@@ -73,10 +73,19 @@ void time_advance(GameState *game) {
     int hours;
     printf("Было %d:00 %2d-го дня, сколько часов ты проведешь за работой:", game->current_hour, game->current_day); //Подстава. так как мне впадлу переписать fail_sys
     hours = failsafe_sys_numbers("");                                                            //еще раз, есть этот принтф, который в свою очередь
-    if (hours < 0) return;                                                               //сдвигает в случае неправильного ввода на след строку
-    game->current_hour += hours;                                                                      //когда нибудь я этим займусь, честно честно
-    game->current_day += game->current_hour / 24;
-    game->current_hour = game->current_hour % 24;
+    if (hours < 1) return;                                                               //сдвигает в случае неправильного ввода на след строку
+
+    while (hours !=0) {
+        if (game->current_hour == 2) {
+            printf("Ты не можешь отдыхать ночью, ночью нужно спать");
+            break;
+        }
+
+        game->current_hour++;
+        game->current_day += game->current_hour / 24;
+        game->current_hour = game->current_hour % 24;
+        hours--;
+    }
 }
 
 
