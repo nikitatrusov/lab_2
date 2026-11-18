@@ -259,8 +259,10 @@ void begin_journey(Level *level_test, Player *Nikra, GameState *game) {
     printf("Этаж %d | wasd (q — выход): \n", level_test->floor_number);
     char line[16];
     while (1) {
-        if (journey_evacuation_check(game, Nikra) == 0)
+        if (journey_evacuation_check(game, Nikra) == 0) {
+            free_map(level_test);
             return;
+        }
         render_hud(game, Nikra, level_test);
         render_map(level_test, Nikra);
         printf("wasd (q — выход): ");
