@@ -22,6 +22,17 @@ int journey_check(GameState game, Player *Nikra) {
 }
 
 
+void free_map(Level *level_test) {
+    if (level_test->mapLocation != NULL) {
+        for (int i = 0; i < level_test->height; i++) {
+            free(level_test->mapLocation[i]);
+        }
+        free(level_test->mapLocation);
+        level_test->mapLocation = NULL;
+    }
+}
+
+
 int journey_evacuation_check(GameState *game, Player *Nikra) {
     if (Nikra->cur_stamina <= 1) {
         printf("Вы потеряли сознание в ходе приключения, к вашему счастью сущности в форме гномиков спасли вас.."
@@ -258,6 +269,7 @@ void begin_journey(Level *level_test, Player *Nikra, GameState *game) {
         if (line[0] == 'q') {
             if (check_stairs(level_test, Nikra, game) == 2) {
                 printf("Вы вышли из башни на 1-м этаже. \n");
+                free_map(level_test);
                 return;
             }
             continue;
