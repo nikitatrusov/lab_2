@@ -90,6 +90,15 @@ int generate_map(Level *level_test, Player *Nikra) {
 }
 
 
+void render_hud(GameState *game, Player *Nikra, Level *level_test) {
+    printf("\nHP: %i/%2i | Выносливость: %d/%2d | Золото: %3i | Этаж: %4i | Время: %05i:00\n", 
+            Nikra->cur_health, Nikra->max_health,
+            Nikra->cur_stamina, Nikra->max_stamina,
+            Nikra->gold,
+            level_test->floor_number,
+            game->current_hour
+        );
+}
 
 
 
@@ -213,6 +222,7 @@ void begin_journey(Level *level_test, Player *Nikra, GameState game) {
     printf("Этаж %d | wasd (q — выход): \n", level_test->floor_number);
     char line[16];
     while (1) {
+        render_hud(&game, Nikra, level_test);
         render_map(level_test, Nikra);
         printf("wasd (q — выход): ");
         if (!fgets(line, sizeof line, stdin)) break;   // EOF / ошибка ввода
