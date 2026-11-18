@@ -2,6 +2,7 @@
 #define MAP_H
 
 #define STAMINA_JOURNEY_MIN 10          //Минимальный показатель в расчетах выносливости для путешествия
+#define BASE_REWARD_MULTIPLIER 3
 
 typedef enum {
     DIR_NONE = 0,

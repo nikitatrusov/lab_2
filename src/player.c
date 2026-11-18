@@ -164,3 +164,11 @@ void character_showcase() {
         printf("==================================\n\n");
     }
 }
+
+
+void time_sleep(GameState *game, Player *Nikra) {
+    printf("Доброе утро фермер, за работу!\n");
+    game->current_hour = 8;
+    game->current_day++;
+    Nikra->cur_stamina=Nikra->max_stamina;
+}

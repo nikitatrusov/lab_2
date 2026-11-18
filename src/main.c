@@ -75,7 +75,7 @@ int main() {
                 begin_journey(&level_test, Nikra, &game);
                 break;
             case 11:
-                time_sleep(&game);
+                time_sleep(&game, Nikra);
                 break;
             default:
                 break;

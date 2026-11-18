@@ -22,6 +22,24 @@ int journey_check(GameState game, Player *Nikra) {
 }
 
 
+int journey_evacuation_check(GameState *game, Player *Nikra) {
+    if (Nikra->cur_stamina <= 1) {
+        printf("Вы потеряли сознание в ходе приключения, к вашему счастью сущности в форме гномиков спасли вас.."
+               "только кажется ваши карманы стали легче.. \n");
+        Nikra->gold /=2;
+        return 0;
+    }
+    else if (game->current_hour == 2) {
+        printf("Кажется твоему герою хочется спать..\n"
+               "К твоему счастью, сущности в форме гномиков вытащили тебя спящего из подземелья.."
+               "только кажется ваши карманы стали легче.. \n");
+            Nikra->gold /=2;
+            return 0;
+    }
+    return 1;
+}
+
+
 int generate_map(Level *level_test, Player *Nikra) {
     if (level_test->mapLocation != NULL) {
         for (int i = 0; i < level_test->height; i++) {
@@ -137,8 +155,14 @@ int check_stairs(Level *level, Player *Nikra, GameState *game) {
     char here = level->mapLocation[Nikra->playerY][Nikra->playerX];
 
     if (here == 'U') {
+
         Nikra->cur_stamina = Nikra->cur_stamina-4;
         time_advance_formap(game);
+
+        int reward = BASE_REWARD_MULTIPLIER * level_test.floor_number;
+        Nikra->gold += reward;
+        printf("Вы получили награду: %d золота\n", reward);
+
         Nikra->playerX = level->width / 2;
         Nikra->playerY = level->height / 2;
         if (generate_map(level, Nikra) != 0) return -1;
@@ -224,6 +248,8 @@ void begin_journey(Level *level_test, Player *Nikra, GameState *game) {
     printf("Этаж %d | wasd (q — выход): \n", level_test->floor_number);
     char line[16];
     while (1) {
+        if (journey_evacuation_check(game, Nikra) == 0)
+            return;
         render_hud(game, Nikra, level_test);
         render_map(level_test, Nikra);
         printf("wasd (q — выход): ");

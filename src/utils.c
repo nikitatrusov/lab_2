@@ -96,13 +96,6 @@ void time_advance_formap(GameState *game) {
 }
 
 
-void time_sleep(GameState *game) {
-    printf("Доброе утро фермер, за работу!\n");
-    game->current_hour = 8;
-    game->current_day++;
-}
-
-
 //Чтение файла с списком предметов item_catalogue.txt
 void item_catalog_reader(void) {
 

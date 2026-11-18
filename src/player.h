@@ -17,4 +17,6 @@ typedef struct {
 extern Player *Nikra;
 extern GameState game;
 
+void time_sleep(GameState *game, Player *Nikra);
+
 #endif
