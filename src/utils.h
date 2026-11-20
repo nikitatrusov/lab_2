@@ -1,6 +1,6 @@
 #ifndef UTILS_H
 #define UTILS_H
-
+#include <time.h>
 #include <windows.h>
 #define MAX_ITEM_NAME_LEN 64    //Длина названия предмета
 #include <stdio.h>
@@ -9,7 +9,7 @@
 #define MAX_USER_NAME_LEN 64    //Длина имени пользователя
 
 //Основная структура данных игры
-typedef struct GameState{
+typedef struct {
     int current_hour;
     int current_day;
     int gameState;

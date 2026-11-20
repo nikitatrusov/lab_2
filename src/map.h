@@ -75,5 +75,6 @@ int map_decoder(const char *encoded, char *decoded, int cap);
 #define MAX_FLOORS 10           //Количество этажей    
 #define fly_range 4
 #define max_flight_range 100
+#define Effect_chance 5
 
 #endif

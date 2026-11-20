@@ -5,7 +5,7 @@
 int main() {
     int gameState = 0;
     int activeCall;
-
+    srand(time(NULL));
 
     //Чтобы не съедало кириллицу powershell'ом
     SetConsoleCP(65001);      // Ввод в UTF-8
