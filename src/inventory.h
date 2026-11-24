@@ -7,11 +7,10 @@
 
 
 //Инициализация типа данных Item, в дальнейшем необходимо для хранения списка предметов
-typedef struct{
+struct Item{
     int id;
     char name[MAX_ITEM_NAME_LEN];
-} Item;
-
+};
 
 extern Item item_names[MAX_ITEMS_INGAME];
 extern int inventory[MAX_INV_SIZE];

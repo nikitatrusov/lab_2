@@ -2,6 +2,7 @@
 
 
 #include "player.h"
+#include "inventory.h"
 
 
 #include <windows.h>

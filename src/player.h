@@ -7,7 +7,7 @@
 #include "effects.h"
 
 
-typedef struct {
+typedef struct Player{
     int max_health;
     int cur_health;
     int max_stamina;

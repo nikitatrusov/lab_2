@@ -1,6 +1,8 @@
 #include "interactions.h"
 
 
+#include <stdio.h>
+
 
 void add_effect(int power, int duration, ActiveEffect *effects, EffectTypes type) {
     for (int i = 0; i < MAX_EFFECTS; i++) {

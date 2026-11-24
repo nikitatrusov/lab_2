@@ -1,6 +1,10 @@
 #include "inventory.h"
 
 
+#include <stdio.h>
+#include <string.h>
+
+
 //Список предметов
 Item item_names[MAX_ITEMS_INGAME];
 

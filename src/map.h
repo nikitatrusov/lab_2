@@ -18,6 +18,7 @@ typedef struct Player Player;
 typedef struct Level Level;
 
 
+
 typedef enum {
     DIR_NONE = 0,
     DIR_UP,
@@ -28,7 +29,7 @@ typedef enum {
 } Direction;
 
 
-Direction dir_from_key(char c) {
+static inline Direction dir_from_key(char c) {
     switch (c) {
         case 'w': return DIR_UP;
         case 's': return DIR_DOWN;
@@ -38,7 +39,7 @@ Direction dir_from_key(char c) {
     }
 }
 
-Direction dir_from_fan(char c) {
+static inline Direction dir_from_fan(char c) {
     switch (c) {
         case '^': return DIR_UP;
         case 'v': return DIR_DOWN;
@@ -48,17 +49,12 @@ Direction dir_from_fan(char c) {
     }
 }
 
-typedef struct {
+typedef struct Level{
     char **mapLocation;
     int width, height;
     int floor_number;
 } Level;
 
-Level level_test = {
-    .width = 10,
-    .height = 10,
-    .floor_number = 1
-};
 
 //Информация о карте
 typedef struct {
@@ -68,6 +64,7 @@ typedef struct {
     char map_name[100]; //Временно для тестов!!!!!
 } MapInfo;
 
+extern Level level_test;
 static const int DIR_DX[DIR_COUNT] = { 0, 0, 0, -1, 1 };
 static const int DIR_DY[DIR_COUNT] = { 0, -1, 1, 0, 0 };
 

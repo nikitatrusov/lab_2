@@ -7,9 +7,16 @@
             "args": [
                 "-fdiagnostics-color=always",
                 "-g",
-                "${file}",
+                "${fileDirname}\\main.c",
+                "${fileDirname}\\player.c",
+                "${fileDirname}\\map.c",
+                "${fileDirname}\\utils.c",
+                "${fileDirname}\\render.c",
+                "${fileDirname}\\inventory.c",
+                "${fileDirname}\\interactions.c",
+                "${fileDirname}\\level_features.c",
                 "-o",
-                "${fileDirname}\\${fileBasenameNoExtension}.exe"
+                "${fileDirname}\\main.exe"
             ],
             "options": {
                 "cwd": "${fileDirname}"

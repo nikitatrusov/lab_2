@@ -5,6 +5,13 @@
 #include "render.h"
 #include "inventory.h"
 
+
+#include <stdlib.h>
+#include <windows.h>
+#include <time.h>
+#include <stdio.h>
+
+
 int main() {
     int gameState = 0;
     int activeCall;
@@ -38,7 +45,7 @@ int main() {
                 render_inventory_menu();
                 break;
             case 2:
-                render_time_menu(&game);
+                //render_time_menu(&game);
                 break;
             case 8:
                 printf("Привет, %s", Nikra->player_name);

@@ -6,6 +6,9 @@
 #include "map.h"
 
 
+#include <stdio.h>
+
+
 //Рендер интерфейса игрока
 void render_hud(GameState *game, Player *Nikra, Level *level_test) {
     printf("\nHP: %i/%2i | Выносливость: %d/%2d | Золото: %3i | Этаж: %4i | Время: %02i:00\n", 

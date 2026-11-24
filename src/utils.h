@@ -5,9 +5,14 @@
 #include "config.h"
 
 
+#include <stddef.h>
+
+
+typedef struct Player Player;
 typedef struct Item Item; 
 //Основная структура данных игры
-typedef struct {
+
+typedef struct GameState{
     int current_hour;
     int current_day;
     int gameState;
@@ -30,5 +35,6 @@ void time_advance_formap(GameState *game);
 void render_time_menu(GameState *game);
 void render_inventory_menu();
 int ask_state_menu(char *request);
+void time_sleep(GameState *game, Player *Nikra);
 
 #endif

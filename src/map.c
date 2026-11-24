@@ -3,9 +3,19 @@
 
 #include "effects.h"
 #include "player.h"
+#include "render.h"
 
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+
+Level level_test = {
+    .width = 10,
+    .height = 10,
+    .floor_number = 1
+};
 
 
 int journey_check(GameState game, Player *Nikra) {
