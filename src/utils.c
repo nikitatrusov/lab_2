@@ -1,6 +1,13 @@
 #include "utils.h"
 
 
+#include "player.h"
+
+
+#include <windows.h>
+#include <stdio.h>
+
+
 char user_name[MAX_USER_NAME_LEN];
 int inventory[MAX_INV_SIZE] = {0};
 

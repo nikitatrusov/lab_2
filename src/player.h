@@ -2,6 +2,8 @@
 #define PLAYER_H
 
 
+#include "inventory.h"
+#include "interactions.h"
 #include "effects.h"
 
 
@@ -19,6 +21,7 @@ typedef struct {
 
 extern Player *Nikra;
 extern GameState game;
+
 
 void character_creation();
 void character_showcase();

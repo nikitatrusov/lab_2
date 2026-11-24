@@ -4,7 +4,7 @@
 #include "inventory.h"
 
 
-#include <stdio.h>
+#include <stdlib.h>
 
 
 Player *Nikra = NULL;
@@ -61,5 +61,3 @@ void character_showcase() {
         printf("==================================\n\n");
     }
 }
-
-

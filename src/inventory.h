@@ -3,15 +3,11 @@
 
 
 #include "utils.h"
-
-
-#define MAX_ITEMS_INGAME 10     //количество предметов в проекте
-#define MAX_INV_SIZE 10         //размер инвентаря
-#define MAX_ITEM_NAME_LEN 64    //Длина названия предмета
+#include "config.h"
 
 
 //Инициализация типа данных Item, в дальнейшем необходимо для хранения списка предметов
-typedef struct {
+typedef struct{
     int id;
     char name[MAX_ITEM_NAME_LEN];
 } Item;
