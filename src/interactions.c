@@ -1,3 +1,5 @@
+#include "interactions.h"
+
 void add_effect(int power, int duration, ActiveEffect *effects, EffectTypes type) {
     for (int i = 0; i < MAX_EFFECTS; i++) {
         if (effects[i].type == type) {
