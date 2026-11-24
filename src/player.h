@@ -2,23 +2,7 @@
 #define PLAYER_H
 
 
-#define MAX_EFFECTS 5
-
-
-
-typedef enum {
-    DEBUFF_NONE = 0,
-    DEBUFF_POISON,
-    DEBUFF_SPRAIN,
-    BUFF_LIVELINESS
-} EffectTypes;
-
-
-typedef struct {
-    EffectTypes type;
-    int time_left;
-    int power;
-} ActiveEffect;
+#include "effects.h"
 
 
 typedef struct {
