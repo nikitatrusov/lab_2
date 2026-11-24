@@ -3,7 +3,7 @@
 
 
 typedef struct GameState GameState;
-typedef struct Player Player; // (Assuming Player is named)
+typedef struct Player Player; 
 typedef struct Level Level;
 
 

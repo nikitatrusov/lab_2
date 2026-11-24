@@ -1,6 +1,11 @@
 #include "level_features.h"
 
 
+#include "player.h"
+#include "map.h"
+#include "utils.h"
+
+
 // 0 — ничего, 1 — поднялся, -1 — спустился, 2 — вышел из логова сатаны
 int check_stairs(Level *level, Player *Nikra, GameState *game) {
     char here = level->mapLocation[Nikra->playerY][Nikra->playerX];

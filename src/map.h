@@ -4,15 +4,6 @@
 #define STAMINA_JOURNEY_MIN 10          //Минимальный показатель в расчетах выносливости для путешествия
 #define BASE_REWARD_MULTIPLIER 3
 
-typedef enum {
-    DIR_NONE = 0,
-    DIR_UP,
-    DIR_DOWN,
-    DIR_LEFT,
-    DIR_RIGHT,
-    DIR_COUNT
-} Direction;
-
 
 Direction dir_from_key(char c) {
     switch (c) {
