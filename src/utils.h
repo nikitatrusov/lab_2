@@ -36,5 +36,8 @@ void time_advance(GameState *game);
 void item_catalog_reader(void);
 void diary_write(GameState *game);
 void time_advance_formap(GameState *game);
+void render_time_menu(GameState *game);
+void render_inventory_menu();
+int ask_state_menu(char *request);
 
 #endif

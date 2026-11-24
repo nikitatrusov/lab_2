@@ -157,11 +157,11 @@ int move_check(Level *level_test, Direction dir, Player *Nikra) {
     Nikra->playerX = nx;
     Nikra->playerY = ny;
     int guard = 0;
-    if (randRange(rand_gen_min, rand_gen_max) < 80) {
+    if (randRange(rand_gen_min, rand_gen_max) < 100) {
         int roll = randRange(rand_gen_min, rand_gen_max);
         if (roll > 66) {
             add_effect(3, 5, Nikra->effects, DEBUFF_POISON);
-        } else if (roll > 33) {
+        } else if (roll > 33 && roll < 67) {
             add_effect(3, 5, Nikra->effects, DEBUFF_SPRAIN);
         } else {
             add_effect(3, 5, Nikra->effects, BUFF_LIVELINESS);
@@ -273,7 +273,7 @@ void begin_journey(Level *level_test, Player *Nikra, GameState *game) {
             free_map(level_test);
             return;
         }
-        process_debuffs(&Nikra->cur_health, Nikra->effects);
+        process_debuffs(&Nikra->cur_health, Nikra->effects, &Nikra->cur_stamina);
         render_hud(game, Nikra, level_test);
         render_map(level_test, Nikra);
         printf("wasd (q — выход): ");
