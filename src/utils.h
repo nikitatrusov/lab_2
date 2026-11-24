@@ -1,13 +1,12 @@
 #ifndef UTILS_H
 #define UTILS_H
-#include <time.h>
-#include <windows.h>
-#define MAX_ITEM_NAME_LEN 64    //Длина названия предмета
-#include <stdio.h>
-#define MAX_ITEMS_INGAME 10     //количество предметов в проекте
-#define MAX_INV_SIZE 10         //размер инвентаря
-#define MAX_USER_NAME_LEN 64    //Длина имени пользователя
 
+#include <stddef.h>
+
+#define MAX_USER_NAME_LEN 64
+#define MAX_ITEMS_INGAME 10
+#define MAX_INV_SIZE 10
+typedef struct Item Item; 
 //Основная структура данных игры
 typedef struct {
     int current_hour;
@@ -18,15 +17,8 @@ typedef struct {
 } GameState;
 
 
-//Инициализация типа данных Item, в дальнейшем необходимо для хранения списка предметов
-typedef struct {
-    int id;
-    char name[MAX_ITEM_NAME_LEN];
-} Item;
-
-extern Item item_names[MAX_ITEMS_INGAME];
 extern char user_name[MAX_USER_NAME_LEN];
-extern int inventory[MAX_INV_SIZE];
+
 
 int randRange(int min, int max);
 int failsafe_sys_numbers(const char *message_text);

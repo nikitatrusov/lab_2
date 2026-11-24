@@ -1,8 +1,5 @@
 #include "utils.h"
-#include "player.h"
 
-//Список предметов
-Item item_names[MAX_ITEMS_INGAME];
 
 char user_name[MAX_USER_NAME_LEN];
 int inventory[MAX_INV_SIZE] = {0};

@@ -1,9 +1,9 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
+
 #define MAX_EFFECTS 5
 
-#include "utils.h"
 
 
 typedef enum {
@@ -36,5 +36,7 @@ typedef struct {
 extern Player *Nikra;
 extern GameState game;
 
+void character_creation();
+void character_showcase();
 
 #endif

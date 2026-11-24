@@ -1,7 +1,9 @@
-#include "player.c"
-#include "map.c"
-#include "utils.c"
+#include "player.h"
+#include "map.h"
+#include "utils.h"
 #include "interactions.h"
+#include "render.h"
+#include "inventory.h"
 
 int main() {
     int gameState = 0;

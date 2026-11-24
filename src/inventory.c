@@ -1,6 +1,10 @@
 #include "inventory.h"
 
 
+//Список предметов
+Item item_names[MAX_ITEMS_INGAME];
+
+
 //Вывод инвентаря на экран
 void inventory_showcase(GameState game) {
     printf("--- Инвентарь ---\n");
@@ -8,6 +12,7 @@ void inventory_showcase(GameState game) {
         printf("Слот %d: [%d] (%s)\n", i, game.inventory[i], item_names[game.inventory[i]].name);
     }
 }
+
 
 //Вывод индексов предметов на экран
 void items_index_showcase() {
@@ -60,6 +65,7 @@ void inventory_slot_clean(GameState *game) {
 }
 
 
+//Поиск предмета в инвентаре по имени
 void inventory_item_search_via_name(GameState game) {
     int amount_of_items = 0;
 

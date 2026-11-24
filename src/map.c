@@ -1,8 +1,4 @@
 #include "map.h"
-#include "player.h"
-#include <stdio.h>
-#include "player.h"
-#include "utils.h"
 
 
 int journey_check(GameState game, Player *Nikra) {

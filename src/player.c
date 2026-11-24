@@ -1,5 +1,11 @@
 #include "player.h"
-#include "utils.h"
+
+
+#include "inventory.h"
+
+
+#include <stdio.h>
+
 
 Player *Nikra = NULL;
 
