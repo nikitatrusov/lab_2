@@ -1,5 +1,12 @@
 #include "render.h"
 
+
+#include "utils.h"
+#include "player.h"
+#include "map.h"
+
+
+//Рендер интерфейса игрока
 void render_hud(GameState *game, Player *Nikra, Level *level_test) {
     printf("\nHP: %i/%2i | Выносливость: %d/%2d | Золото: %3i | Этаж: %4i | Время: %02i:00\n", 
             Nikra->cur_health, Nikra->max_health,
@@ -11,6 +18,7 @@ void render_hud(GameState *game, Player *Nikra, Level *level_test) {
 }
 
 
+//Рендер карты в приключении
 void render_map(Level *level_test, Player *Nikra) {
     for (int y = 0; y < level_test->height; y++) {
         for ( int x = 0; x < level_test->width; x++) {
@@ -24,6 +32,7 @@ void render_map(Level *level_test, Player *Nikra) {
 }
 
 
+//Рендер подменю времени
 void render_time_menu(GameState *game) {
     printf("\n \n====== Меню =====\n"
            "[0] Выход\n"
@@ -53,6 +62,7 @@ void render_time_menu(GameState *game) {
 }
 
 
+//Рендер подменю инвентаря
 void render_inventory_menu() {
     printf("\n \n====== Меню =====\n"
            "[0] Выход\n"

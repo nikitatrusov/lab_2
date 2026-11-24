@@ -1,4 +1,4 @@
-#ifndef INTERACTIONS.H
-#define INTERACTIONS.H
+#ifndef INTERACTIONS_H
+#define INTERACTIONS_H
 
 #endif
