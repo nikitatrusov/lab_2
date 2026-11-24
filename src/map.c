@@ -1,6 +1,13 @@
 #include "map.h"
 
 
+#include "effects.h"
+#include "player.h"
+
+
+#include <stdio.h>
+
+
 int journey_check(GameState game, Player *Nikra) {
     if (Nikra == NULL) {
         printf("Создай персонажа прежде чем идти в поход\n");

@@ -3,6 +3,29 @@
 
 #define STAMINA_JOURNEY_MIN 10          //Минимальный показатель в расчетах выносливости для путешествия
 #define BASE_REWARD_MULTIPLIER 3
+#define T_chance 5
+#define C_chance 5
+#define rand_gen_max 100
+#define rand_gen_min 0
+#define MAX_FLOORS 10           //Количество этажей    
+#define fly_range 4
+#define max_flight_range 100
+#define Effect_chance 5
+
+
+typedef struct GameState GameState;
+typedef struct Player Player; 
+typedef struct Level Level;
+
+
+typedef enum {
+    DIR_NONE = 0,
+    DIR_UP,
+    DIR_DOWN,
+    DIR_LEFT,
+    DIR_RIGHT,
+    DIR_COUNT
+} Direction;
 
 
 Direction dir_from_key(char c) {
@@ -58,14 +81,5 @@ void begin_journey(Level *level_test, Player *Nikra, GameState *game);
 void read_map(void);
 int map_decoder(const char *encoded, char *decoded, int cap);
 
-
-#define T_chance 5
-#define C_chance 5
-#define rand_gen_max 100
-#define rand_gen_min 0
-#define MAX_FLOORS 10           //Количество этажей    
-#define fly_range 4
-#define max_flight_range 100
-#define Effect_chance 5
 
 #endif
